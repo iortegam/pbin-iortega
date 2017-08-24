@@ -1,0 +1,127 @@
+#----------------------------------------------------------------------------------------
+# Name:
+#        TAB_Defaults.input
+#
+# Purpose:
+#       This is the main input file for remote operations at TAB
+#
+#
+#
+# Notes:
+#       1)
+#
+#
+#
+#----------------------------------------------------------------------------------------
+
+#------------------------
+# Base directory for data
+# LogDirectory -- General logging that is not DAYDIR, eg current file (note final /)
+#------------------------
+Dir_baseData = /home/tabftir/daily/
+Dir_Log = /home/tabftir/remote/ops/
+
+#---------------------------
+# TCP Data Server Parameters
+#-------------------------------------------------------------------------------------------
+# FTSDataServ_IP   -- IP address of where the TCP data server is hosted
+# FTSDataServ_PORT -- Port used by the TCP data server
+# Bruker_IP        -- IP address of the EWS on Bruker
+# OPUSServer_IP    -- IP address of the Windows PC running OPUS
+# TCPbufferSize    -- Max buffer size allowed in transfer of data to and from TCP data server
+# EWSupdateInt     -- Interval [seconds] between updating the TCP data server with information from the Bruker EWS
+#-------------------------------------------------------------------------------------------
+FTS_DataServ_IP    = 192.168.1.100
+FTS_DataServ_PORT  = 5555
+FTS_DATASERV_BSIZE = 1024
+Bruker_IP          = 192.168.1.102
+UPS_IP             = 192.168.1.104
+Bruker_UpdateInt   = 5
+OPUS_Server_IP     = 192.168.1.103
+
+#---------------------------------------------------
+# OPUS variables
+# Dir_xpm      -- Windows path to xpm folder
+# Dir_macro    -- Windows path to macro folder
+# Dir_WindData -- Windows path to shared data folder
+#---------------------------------------------------
+Dir_macro   = C:\bin\
+Dir_xpm     = C:\Users\Public\Documents\Bruker\OPUS_7.5.18\XPM\Solar\
+Dir_WinData = \\TAB1\Daily_Data\
+
+#-------------------
+# Tracker parameters
+#----------------------------------------------------
+# File_trackerInput    -- Input file for NCAR tracker
+#----------------------------------------------------
+File_trackerInput = /home/tabftir/remote/ops/thule_trackerCtl.py
+
+
+#-----------------------
+# SMTP email information
+#--------------------------------------------------------------------------
+# fromEmail   -- Email address sent from. This does not need to be a legite
+#                email address
+# toEmail     -- Email address(s) letter is sent to. Comma delimited.
+#---------------------------------------------------------------------------
+Email_from = FTIR@thule
+Email_to   = ebaumer@ucar.edu,jamesw@ucar.edu
+
+
+#---------------------
+# Input lists for tabd
+#---------------------------------------------------------------------------
+# AnalogFile   -- List of analog inputs
+# DigitalFile  -- List of digital inputs and outputs
+#---------------------------------------------------------------------------
+File_AnalogInput  = /home/tabftir/remote/ops/analog.list
+File_DigitalInput = /home/tabftir/remote/ops/digital.list
+
+
+#-------------------------------
+# Interface with OPUS Parameters
+#--------------------------------------------------------------------------------------
+# IOtimeoutMeas  -- The amount of time opusIO program waits [minutes] for a scan
+#                   before the it considers the OPUS program hung
+# IOtimeout      -- The amount of time opusIO program waits [seconds] for a response
+#                   from OPUS after sending a command. After every command OPUS should
+#                   send back a response
+#--------------------------------------------------------------------------------------
+#IOtimeoutMeas = 20
+#IOtimeout     = 30
+
+#-------------------------
+# Input lists for dispatch
+#---------------------------------------------------------------------------
+# OPUSScanList = list of experiments to send OPUS
+# TopoFile     = horizon minimums
+#---------------------------------------------------------------------------
+File_OPUSScanlist = /home/tabftir/remote/ops/opusscan.list
+File_TopoInput = /home/tabftir/remote/ops/thule.top
+
+#-------------------------
+# Dispatch command input
+#---------------------------------------------------------------------------
+# RemoteCmdFile = Command file searched in each dispatch loop
+#---------------------------------------------------------------------------
+File_RemoteCmd = /home/tabftir/remote/ops/command.rmt
+
+#--------------------------------
+# Observing Conditions Parameters
+#-------------------------------------------------------------------------------------------
+# Extern_Solar_Flip_Min -- External solar sensor nominal elevation mirror position, volts 0-10
+# Extern_Solar_Nom_Min  -- External solar flipped elevation mirror position A, volts 0-10
+# MaxWindSpeed          -- Maximum tolerable wind speed meters/sec
+# MaxRelHumidity        -- Maximum outside relativity %rh
+# EXTERN_SOLAR_DELAY    -- delay in minutes of good sun readings before opening hatch
+# LN2FillDur            -- Time to hold LN2 switch on during detector fill in minutes
+#-------------------------------------------------------------------------------------------
+# min xtern solar about 2.0 - 2.2
+EXTERN_SOLAR_FLIP_MIN   = 2.2
+EXTERN_SOLAR_NOM_MIN    = 2.05
+EXTERN_SOLAR_DELAY      = 2
+ATM_WIND_SPEED_MAX      = 10.0
+ATM_REL_HUMIDITY_MAX    = 90.0
+LN2_FILL_DUR            = 7
+LN2_PRESSURE_MIN        = 3.0
+!

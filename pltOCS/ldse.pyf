@@ -1,0 +1,14 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module ldse ! in 
+    interface  ! in :ldse
+        subroutine ldse(ftag,itag) ! in :ldse:ldse.f
+            character*64 intent(in) :: ftag
+            integer*4 dimension(360,180),intent(out) :: itag
+        end subroutine ldse
+    end interface 
+end python module ldse
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

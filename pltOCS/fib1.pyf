@@ -1,0 +1,21 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module fib ! in 
+    interface  ! in :fib
+        subroutine fib(fname,iyrst,imst,idst,iyrnd,imnd,idnd,sst,ice) ! in :fib:fib1.f
+            character*64 intent(in) :: fname
+            integer*4 intent(out) :: iyrst
+            integer*4 intent(out) :: imst
+            integer*4 intent(out) :: idst
+            integer*4 intent(out) :: iyrnd
+            integer*4 intent(out) :: imnd
+            integer*4 intent(out) :: idnd
+            real*4 dimension(360,180),intent(out) :: sst
+            integer*4 dimension(360,180),intent(out) :: ice
+        end subroutine fib
+    end interface 
+end python module fib
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
