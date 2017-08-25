@@ -174,6 +174,7 @@ def main(argv):
         chi2y.append(ds['chi2y'])
 
 
+
     clmap        = 'jet'
     cm           = plt.get_cmap(clmap)    
     yearsLc      = YearLocator()
@@ -184,7 +185,7 @@ def main(argv):
     DateFmt      = DateFormatter('%Y')
 
     colors = ['r', 'b', 'g', 'y', 'c', 'k']
-    gas4ratio = pltInputs['g4ratio']
+    gas4ratio = pltInputs['g4ratio'].upper()
 
     if pltInputs['errorFlg']: fig, ax = plt.subplots(7,figsize=(8,15), sharex=True)
     else: fig, ax = plt.subplots(5,figsize=(8,10), sharex=True)
