@@ -72,7 +72,45 @@ def TikCov(nlayer, alpha, pathOut):
 
     R=alpha*np.dot(L1.T,L1)
 
+    print nlayer
+    print L1.T.shape
+    print L1.shape
+    print R.shape
+
+    exit()
+
     np.savetxt(pathOut+'Tik.input',R)
+
+def create_tik(gridbound,transflag=True,normalizeflag=True,quiet=True,logger=rootlogger):
+  """Create a Tikhonov matrix with strength 1 for a non-equidistant grid
+
+  Input argument: a ndarray of gridboundaries (1D) or a string for the file containing the grid boundaries (increasing height)
+  Optional key arguments::
+    transflag=True, if true, the matrix is transformed to work on a decreasing grid coordinate system
+    normalizeflag=True, if true, the matrix is normalized with mean of the layer thickness (if false, unit is $km^{-2}$);;"""
+    logger=getlogger(logger,'create_tik')
+  
+    if type(gridbound)==ndarray: 
+        gridsize=gridbound.shape[0]-1
+        boundaries=sort(gridbound)
+    else: 
+        try: fid=open(gridbound,'r')
+        except: 
+            logger.error('Unable to load the grid file with boundaries %s'%gridbound)
+            return array([])
+        gridsize=int(fid.readline())
+        boundaries=ftir.tools.read_matrixfile(fid)
+    if boundaries.shape!=(gridsize+1,): logger.error('Wrongly shaped data in %s'%gridbound);return array([])
+  logger.debug('Boundaries: %s'%boundaries)
+  l1=zeros((gridsize-1,gridsize));mids=array([(boundaries[i+1]+boundaries[i])/2 for i in range(gridsize)])
+  for i in range(l1.shape[0]): 
+    l1[i,i]=-1;l1[i,i+1]=1
+  thickness=array([mids[i+1]-mids[i] for i in range(gridsize-1)])
+  if normalizeflag: thickness/=thickness.mean()
+  out=l1.T.dot(diag(thickness**-2)).dot(l1)
+  if transflag: out=eye(gridsize)[::-1,:].dot(out).dot(eye(gridsize)[::-1,:])
+  logger.debug('Tikhonov=%s'%out)
+  return out;
 
                                 #-------------------------#
                                 #         Main            #
@@ -88,6 +126,11 @@ def main():
         #alpha     = [100]                                    #ALPHA VALUES TO TEST
     	TikOut    = '/data1/ebaumer/'+loc.lower()+'/'+gas.lower()+'/x.'+gas.lower()+'/'                #PATH TO SAVE THE TIK MATRIX
         binDir    = '/data/ebaumer/Code/sfit-core-code/src/'                                           #PATH FOR THE SFIT4 SOURCE CODE
+
+        midpnt    = [113,100.25,  89.85,   81.1,    73.385,  66.585,  60.59,   55.315,  50.7,    46.68,   43.19,   
+                     40.17,   37.555,  35.285,  33.3,    31.53,   29.915,  28.4,    26.94,   25.515,  24.125,  22.77,   
+                     21.45,   20.17,   18.925,  17.715,  16.54,   15.4    14.3,    13.235,  12.205,  11.21,   10.2493, 
+                     9.3264,  8.4356,  7.5769,  6.7504,  5.9559,  5.1986,  4.4734,  3.7803,  3.1193,  2.4904,  1.8986]
 
         errFlg    = True                                                                               #ERROR ANALYSIS?
         saveFlg   = True                                                                               #SAVE PDF FILE?

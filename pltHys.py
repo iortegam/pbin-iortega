@@ -83,9 +83,9 @@ def main():
     #-------------------
     dataDir    = '/data/iortega/results/tab/Hysplit/tdump/'
     pltDir     = '/data/iortega/results/tab/Hysplit/Fig/'
-    saveFlg    = False
-    #DOI        = ['0525', '0527','0528','0529','0530','0601','0605','0606','0607','0609','0610','0611','0616','0617','0618','0619','0627']   #Days Of Interest
-    DOI        = ['0618']
+    saveFlg    = True
+    DOI        = ['0525', '0527','0528','0529','0530','0601','0605','0606','0607','0609','0610','0611','0616','0617','0618','0619','0627']   #Days Of Interest
+    #DOI        = ['0605']
    
     #-------------------
     #Making sure Directories exist
@@ -110,7 +110,7 @@ def main():
     drssplt = np.asarray(drssplt)
     
     if saveFlg:
-    	outFname  = pltDir + 'plt_Hysplit4.pdf'
+    	outFname  = pltDir + 'plt_Hysplit4_v2.pdf'
     	pdfsav = PdfPages(outFname)
 
     lat    = 76.52   #THULE
@@ -130,54 +130,54 @@ def main():
     #MAP WITH BEARING
     #-------------------
 
-    for d in DOI:
+  #   for d in DOI:
 
-    	clmap        = 'jet'
-    	cm           = plt.get_cmap(clmap)   
-    	fig, ax1  = plt.subplots(1, figsize=(7,6))
+  #   	clmap        = 'jet'
+  #   	cm           = plt.get_cmap(clmap)   
+  #   	fig, ax1  = plt.subplots(1, figsize=(7,6))
 
-    	ax1.set_title('Line of Sight in Thule for different SAA')
+  #   	ax1.set_title('Line of Sight in Thule for different SAA')
 
-    	map = Basemap(projection='npstere',boundinglat=65,lon_0=270,  resolution='l',  ax=ax1)
-    	map.fillcontinents(color = 'gray', lake_color='gray', alpha=0.25)
-    	map.drawcoastlines()
-    	map.drawparallels(np.arange(-80., 81., 20.), alpha=0.25)
-    	map.drawmeridians(np.arange(-180., 181., 20.), alpha=0.25)
-    	map.drawmapboundary(fill_color= 'white')
-    	#map.drawmapscale(-105., 70, -105.0, 75, 30, barstyle='fancy')
-
-
-    	for (a,s) in zip(saa,sza):
-
-    		lat2, lon2 = destination(lat, lon, dist, a, radius=6371.008771415)
-    		map.drawgreatcircle(lon,lat,lon2,lat2,linewidth=2,color='m')
-	        x2, y2 = map(lon2, lat2)
-	        ax1.plot(x2, y2, marker='D', color='m', markersize=7)
-
-	        #ax1.annotate(str(a), xytext=(lon2, lat2), textcoords='data')
-	        ax1.text(x2, y2, str(a), fontsize=14, color='m')
+  #   	map = Basemap(projection='npstere',boundinglat=65,lon_0=270,  resolution='l',  ax=ax1)
+  #   	map.fillcontinents(color = 'gray', lake_color='gray', alpha=0.25)
+  #   	map.drawcoastlines()
+  #   	map.drawparallels(np.arange(-80., 81., 20.), alpha=0.25)
+  #   	map.drawmeridians(np.arange(-180., 181., 20.), alpha=0.25)
+  #   	map.drawmapboundary(fill_color= 'white')
+  #   	#map.drawmapscale(-105., 70, -105.0, 75, 30, barstyle='fancy')
 
 
+  #   	for (a,s) in zip(saa,sza):
 
-		x, y = map(lon, lat)
-		ax1.plot(x, y, marker='D', color='b', markersize=7)
+  #   		lat2, lon2 = destination(lat, lon, dist, a, radius=6371.008771415)
+  #   		map.drawgreatcircle(lon,lat,lon2,lat2,linewidth=2,color='m')
+	 #        x2, y2 = map(lon2, lat2)
+	 #        ax1.plot(x2, y2, marker='D', color='m', markersize=7)
 
-		if saveFlg:
-			pdfsav.savefig(fig,dpi=200)
-            #--------For Single Figures
-            #outFname  = pltDir + drssplt[-1]+'.pdf'
-            #plt.savefig(outFname, bbox_inches='tight')
-            #--------
-        else:       
-            plt.show(block=False)
-            user_input = raw_input('Press any key to exit >>>')
-            sys.exit()
-            plt.close()
+	 #        #ax1.annotate(str(a), xytext=(lon2, lat2), textcoords='data')
+	 #        ax1.text(x2, y2, str(a), fontsize=14, color='m')
 
 
 
-   
+		# x, y = map(lon, lat)
+		# ax1.plot(x, y, marker='D', color='b', markersize=7)
 
+		# if saveFlg:
+		# 	pdfsav.savefig(fig,dpi=200)
+  #           #--------For Single Figures
+  #           #outFname  = pltDir + drssplt[-1]+'.pdf'
+  #           #plt.savefig(outFname, bbox_inches='tight')
+  #           #--------
+  #       else:       
+  #           plt.show(block=False)
+  #           #user_input = raw_input('Press any key to exit >>>')
+  #          # sys.exit()
+  #           plt.close()
+
+    latMin   = 60.   # 54.
+    latMax   = 88.    # 88.
+    lonMin   = -90.   # -65.
+    lonMax   = -25.    # 20
 
     #-------------------
     #HYSPLIT: Reading Files
@@ -206,40 +206,52 @@ def main():
 	        #-------------------
 	        #Plot Map and Height in same Figure
 	        #-------------------
-	        fig, (ax1, ax2)  = plt.subplots(2, figsize=(9,7))
+	        fig, (ax1, ax2)  = plt.subplots(2) # figsize=(10, 10)
 
-	        gs   = gridspec.GridSpec(2,1,height_ratios=[3,1], wspace=0.05, hspace=0.05)
+	        gs   = gridspec.GridSpec(2, 1,height_ratios=[3,1], wspace=0.05, hspace=0.05)
 	        ax1  = plt.subplot(gs[0], sharex=ax2)
+
 	        ax2  = plt.subplot(gs[1])
 
-	        map = Basemap(projection='npstere',boundinglat=40,lon_0=270,  resolution='l',  ax=ax1)
-	        map.drawgreatcircle(lon,lat,lon2,lat2,linewidth=2,color='m')
+	        map = Basemap(llcrnrlat=latMin,urcrnrlat=latMax,
+    	            llcrnrlon=lonMin,urcrnrlon=lonMax,
+    	            rsphere=(6378137.00,6356752.3142),
+    	            resolution='l',area_thresh=1000.,projection='lcc',
+    	            lat_1=latMin,lon_0=-60, ax=ax1)
+
+	        #map = Basemap(projection='npstere',boundinglat=40,lon_0=270,  resolution='l',  ax=ax1)
+
+
+	        #map.drawgreatcircle(lon,lat,lon2,lat2,linewidth=2,color='m')
 
 	        map.fillcontinents(color = 'gray', lake_color='gray', alpha=0.25)
-	        map.drawcoastlines()
-	        map.drawparallels(np.arange(-80., 81., 20.), alpha=0.25)
-	        map.drawmeridians(np.arange(-180., 181., 20.), alpha=0.25)
-	        map.drawmapboundary(fill_color= 'white')
+
+	        map.drawcoastlines(color='black')
+	        map.drawcountries(color='lightgrey')
+
+	        map.drawparallels(np.arange(-80., 81., 5.), labels=[1,0,0,0], alpha=0.25)
+	        map.drawmeridians(np.arange(-180., 181., 10.),  labels=[0,0,0,1], alpha=0.25)
+	        #map.drawmapboundary(fill_color= 'white')
 	        #map.drawmapscale(-105., 70, -105.0, 75, 30, barstyle='fancy')
 
-	        x, y = map(lon, lat)
-	        ax1.plot(x, y, marker='D', color='m', markersize=7)
+	        # x, y = map(lon, lat)
+	        # ax1.plot(x, y, marker='D', color='m', markersize=7)
 
-	        x2, y2 = map(lon2, lat2)
-	        ax1.plot(x2, y2, marker='D', color='m', markersize=7)
+	        # x2, y2 = map(lon2, lat2)
+	        # ax1.plot(x2, y2, marker='D', color='m', markersize=7)
 	        
-	        # calculate map coordinates and plot all trajectories 1 to 28
+	        #calculate map coordinates and plot all trajectories 1 to 28
 	        T = {}
 	        H = {}
 	        for i in range(1,4):
 
-	        	T[str(i)] = (hysplit.lat[hysplit.traj==i], hysplit.lon[hysplit.traj==i])
-	        	x,y = map(T[str(i)][1],T[str(i)][0])
-	        	ax1.plot(x, y, '-', linewidth=3)
-	        	H[str(i)] = (hysplit.height[hysplit.traj==i], date[hysplit.traj==i])
+	         	T[str(i)] = (hysplit.lat[hysplit.traj==i], hysplit.lon[hysplit.traj==i])
+	         	x,y = map(T[str(i)][1],T[str(i)][0])
+	         	ax1.plot(x, y, '-', linewidth=3)
+	         	H[str(i)] = (hysplit.height[hysplit.traj==i], date[hysplit.traj==i])
 	        	
-	        	ax2.plot(H[str(i)][1], H[str(i)][0]/1000., '-', linewidth=2)
-	        	ax2.grid()
+	         	ax2.plot(H[str(i)][1], H[str(i)][0]/1000., '-', linewidth=2)
+	         	ax2.grid()
 
 	        ax2.xaxis.set_major_formatter(DateFmt)
 	        ax2.set_ylabel('Height [km]', fontsize=14)
@@ -260,7 +272,7 @@ def main():
 	        else:       
 	            plt.show(block=False)
 	            user_input = raw_input('Press any key to exit >>>')
-	            sys.exit()
+	            #sys.exit()
 	            plt.close()
             #sys.exit()
     if saveFlg: pdfsav.close()

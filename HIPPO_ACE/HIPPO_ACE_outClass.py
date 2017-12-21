@@ -485,7 +485,7 @@ class HIPPOClass():
             self.PrfLat.setdefault(BinID[i]+'_Prf_mean',[]).append(gas_mean_i)
             self.PrfLat.setdefault(BinID[i]+'_Prf_std',[]).append(gas_std_i)
             self.PrfLat.setdefault(BinID[i]+'_Prf_med',[]).append(gas_med_i)
-            self.PrfLat.setdefault(BinID[i]+'_Prf_var',[]).append(gas_var_i)of 2030.75 – 2031
+            self.PrfLat.setdefault(BinID[i]+'_Prf_var',[]).append(gas_var_i)
 
 
         fig, ax = plt.subplots(1,2, figsize=(11, 7))

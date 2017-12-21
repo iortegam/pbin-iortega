@@ -27,9 +27,9 @@ def main(argv):
 	#INPUTS
 	#----------------------------------------------------------
 	
-	loc        = 'stp'
+	loc        = 'eur'
 
-	iyear      = 2009
+	iyear      = 2006
 	fyear      = 2016
 
 	savePDF    = False
@@ -48,12 +48,10 @@ def main(argv):
 
 	nyears = int(fyear) - int(iyear) + 1
 
-	if loc.lower() ==  'eur':
-		NCEPhgtDir  = '/data1/projects/ocs/tor'
-	elif loc.lower() ==  'ahs':
+	if loc.lower() ==  'ahs':
 		NCEPhgtDir  = '/data1/projects/ocs/ldr/'
 	else:
-		NCEPhgtDir  = '/data1/projects/ocs/'+loc.lower()+''
+		NCEPhgtDir  = '/data1/projects/ocs/'+loc.lower()+'/'
 
 
 	if loc.lower() == 'tab':
@@ -118,6 +116,9 @@ def main(argv):
 
 	elif loc.lower() == 'pmb':
 	    loc2 = 'Paramaribo'
+
+	elif loc.lower() == 'alt':
+	    loc2 = 'Altzomoni'
 
 	else:
 	    'Site does not exist!'
@@ -192,9 +193,7 @@ def main(argv):
 	TP_ncep_interp = interp1d(doy_ncep,TP_ncep, kind='linear')(doyMeas)
 
 
-	if loc.lower() ==  'eur':
-		outData  = '/data1/projects/ocs/tor/Dates_'+loc2+'_dNCEP.ascii'
-	elif loc.lower() ==  'ahs':
+	if loc.lower() ==  'ahs':
 		outData  = '/data1/projects/ocs/ldr/Dates_'+loc2+'_dNCEP.ascii'
 	else: 
 		outData  = '/data1/projects/ocs/'+loc.lower()+'/Dates_'+loc2+'_dNCEP.ascii'

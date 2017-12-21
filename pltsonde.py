@@ -104,16 +104,17 @@ def main(argv):
     # Radiosonde Info
     #---------------------------------
     sonde = rs.Pltsonde(pltInputs['retDir'], pltInputs['ctlFile'], pltInputs['sondeDir'], pltInputs['loc'], iyear=pltInputs['iyear'],imnth=pltInputs['imnth'],iday=pltInputs['iday'],
-    fyear=pltInputs['fyear'],fmnth=pltInputs['fmnth'],fday=pltInputs['fday'],outFname=pltInputs['pltFile'])
+    fyear=pltInputs['fyear'],fmnth=pltInputs['fmnth'],fday=pltInputs['fday'],outFname=pltInputs['pltFile'], fleoutFlg=pltInputs['fleoutFlg'], version=pltInputs['ver'])
 
     #----------------------
     # Call to plot profiles
     #----------------------
-    sonde.plt1(fltr=pltInputs['fltrFlg'],allGas=False,sclfct=pltInputs['sclfct'],sclname=pltInputs['sclfctName'],mnthFltr=pltInputs["mnths"],mnthFltFlg=pltInputs["mnthFlg"],
+    sonde.plt(fltr=pltInputs['fltrFlg'],allGas=False,sclfct=pltInputs['sclfct'],sclname=pltInputs['sclfctName'],mnthFltr=pltInputs["mnths"],mnthFltFlg=pltInputs["mnthFlg"],
                errFlg=pltInputs['errorFlg'],minSZA=pltInputs['minSZA'],maxSZA=pltInputs['maxSZA'],maxRMS=pltInputs['maxRMS'],minTC=pltInputs['minTC'],maxTC=pltInputs['maxTC'],
                minDOF=pltInputs['minDOF'],maxCHI=pltInputs['maxCHI'],dofFlg=pltInputs['dofFlg'],rmsFlg=pltInputs['rmsFlg'],tcFlg=pltInputs['tcNegFlg'],
                pcFlg=pltInputs['pcNegFlg'],szaFlg=pltInputs['szaFlg'],cnvrgFlg=pltInputs['cnvrgFlg'],chiFlg=pltInputs['chiFlg'],tcMMflg=pltInputs['tcMMFlg'], 
-               pCols=pltInputs['pCols'], smthFlg=pltInputs['smthFlg'], doiplt=pltInputs['doi'], loc=pltInputs['loc'], latFTS =pltInputs['latFTS'], lonFTS =pltInputs['lonFTS'] )
+               pCols=pltInputs['pCols'], smthFlg=pltInputs['smthFlg'], doiplt=pltInputs['doi'], loc=pltInputs['loc'], latFTS =pltInputs['latFTS'], lonFTS =pltInputs['lonFTS'],
+               altCG= pltInputs['altCG'], diffT= pltInputs['diffT'], dfValue= pltInputs['dfValue'])
 
     #-------------------------------------------------------------------------
     #END PLOTS

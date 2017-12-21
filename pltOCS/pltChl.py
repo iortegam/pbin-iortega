@@ -25,7 +25,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from pylab import *
-from netCDF4 import Dataset
+
 import datetime, types
 import string
 from matplotlib.backends.backend_pdf import PdfPages 
@@ -88,7 +88,7 @@ def main():
     Sensor    = 'MODIS'  # VIIRS
     DataDir   = '/data1/iortega/Chlorophyll/'+Sensor.upper()+'/'
    
-    saveFlg   = True
+    saveFlg   = False
     
     moi       = 6       #MONTHS OF INTEREST FOR MAP
 
@@ -106,15 +106,15 @@ def main():
     #-------------------------------------------
     #DEFINING THE LATITUDE/LONGITUDE TO AREA TO CALCULATE TIME SERIES
     #--------------------------------------------
-    #north2 = 78.
-    #south2 = 75.
-    #west2 = -78
-    #east2 = -70
+    # north2  = 78.
+    # south2  = 74.
+    # west2   = (282 - 360.)
+    # east2   = (300 - 360.)
 
-    north2  = 78.
-    south2  = 74.
-    west2   = (282 - 360.)
-    east2   = (300 - 360.)
+    north2  = 76.75
+    south2  = 74.5
+    west2   = (283 - 360.)
+    east2   = (298 - 360.)
 
     if saveFlg:
         #outFname  = DataDir +'plt_chlorophyll_'+"{0:02d}".format(yoi)+"{0:02d}".format(moi)+'.pdf'

@@ -21,6 +21,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 from matplotlib.dates import DateFormatter, MonthLocator, YearLocator
 
+from matplotlib.backends.backend_pdf import PdfPages #to save multiple pages in 1 pdf...
+
 
 
 
@@ -62,27 +64,38 @@ def main():
     #ver        = 'Current_WP'    #'Current_v2'    #'Current_v2'    #'Current_WP'    #'Current_WP_v5'   #'Current_WP'    #'Current_v2'   #'Current_v2'     #'Current_v3'             
     #ctlF       = 'sfit4.ctl'     #'sfit4_v2.ctl'  #'sfit4_v2.ctl'  #'sfit4.ctl'     #'sfit4_v5.ctl'    #'sfit4_3.ctl'   #'sfit4_v2.ctl' # 'sfit4_v2.ctl'  #'sfit4_v3.ctl'
     
-    loc        = 'fl0'
-    gasName    = 'co'
-    ver        = 'Current_v3'
-    ctlF       = 'sfit4_v3.ctl'
+    loc        = 'tab'
+    gasName    = 'h2o'
+    ver        = 'Current_ERA'
+    ctlF       = 'sfit4_v1.ctl'
 
     #------
     # Flags
     #------
     fltrFlg    = True                  # Flag to filter the data   
-    maxrms     = 3.0                  # Max Fit RMS to filter data. Data is filtered according to <= maxrms
-    mindof     = 0.0
+    errorFlg   = True
+    saveFlg    = True                  # Flag to either save data to pdf file (saveFlg=True) or plot to screen (saveFlg=False)
     
+    dofFlg     = True                   # Flag to filter based on min DOFs
+    pcNegFlg   = True                   # Flag to filter profiles with negative partial columns
+    tcNegFlg   = True                   # Flag to filter profiles with negative total columns
+    cnvrgFlg   = True                   # Flag to filter profiles that did not converge
+    rmsFlg     = True                   # Flag to filter based on max RMS
+    
+    maxRMS     = 2.0                         # Max Fit RMS to filter data. Data is filtered according to <= maxrms
+    minDOF     = 1.0                    # Min DOFs for filtering
+    sclfct     = 1.0E9                  # Scale factor to apply to vmr plots (ppmv=1.0E6, ppbv=1.0E9, etc)
+    sclfctName = 'ppbv'                 # Name of scale factor for labeling plots    
+  
     #----------------------
     # Date range to process
     #----------------------
-    iyear      = 2014
-    imnth      = 8
-    iday       = 3
-    fyear      = 2014
-    fmnth      = 8
-    fday       = 3
+    iyear      = 2016
+    imnth      = 1
+    iday       = 1
+    fyear      = 2017
+    fmnth      = 12
+    fday       = 31
 
     #------------
     # Directories
@@ -92,9 +105,14 @@ def main():
     #------
     # Files
     #------
-    ctlFile    = '/data1/ebaumer/'+loc.lower()+'/'+gasName.lower()+'/'+'x.'+gasName.lower()+'/'+ctlF
-    outFileDir = '/data1/ebaumer/'+loc.lower()+'/HR-FTIR/' 
-    icarttHdr  = '/data1/ebaumer/icartt_Hdr.txt'
+    ctlFile     = '/data1/ebaumer/'+loc.lower()+'/'+gasName.lower()+'/'+'x.'+gasName.lower()+'/'+ctlF
+    outFileDir  = '/data1/ebaumer/'+loc.lower()+'/'+gasName.lower()+'/' 
+    icarttHdr   = '/data1/ebaumer/icartt_Hdr.txt'
+    outFileName = outFileDir + loc.upper()+ '-FTS-'+gasName.upper()+'_mm.ascii'
+
+    pltFile     =  outFileDir + loc.upper()+ '-FTS-'+gasName.upper()+'.pdf'
+
+    if saveFlg: pdfsav = PdfPages(pltFile)
 
     #---------------------------
     # Check file and directories
@@ -122,10 +140,11 @@ def main():
     #----------------
     # Read Error Data
     #----------------
-    statDataCl.readError(totFlg=True,sysFlg=False,randFlg=False,vmrFlg=False,avkFlg=False,KbFlg=False)
-    tot_rnd  = np.array(statDataCl.error['Total random uncertainty'])
-    tot_sys  = np.array(statDataCl.error['Total systematic uncertainty'])
-    tot_std  = np.sqrt(tot_rnd**2 + tot_sys**2) 
+    if errorFlg:
+        statDataCl.readError(totFlg=True,sysFlg=False,randFlg=False,vmrFlg=False,avkFlg=False,KbFlg=False)
+        tot_rnd  = np.array(statDataCl.error['Total random uncertainty'])
+        tot_sys  = np.array(statDataCl.error['Total systematic uncertainty'])
+        tot_std  = np.sqrt(tot_rnd**2 + tot_sys**2) 
 
 
     
@@ -137,7 +156,7 @@ def main():
     #--------------------
     # Call to filter data
     #--------------------
-    if fltrFlg: statDataCl.fltrData(statDataCl.PrimaryGas,mxrms=maxrms,rmsFlg=True,tcFlg=True,pcFlg=True,cnvrgFlg=True, minDOF=mindof,  dofFlg=True)
+    if fltrFlg: statDataCl.fltrData(statDataCl.PrimaryGas,mxrms=maxRMS,rmsFlg=rmsFlg,tcFlg=tcNegFlg,pcFlg=pcNegFlg,cnvrgFlg=cnvrgFlg, minDOF=minDOF,  dofFlg=dofFlg)
     else:       statDataCl.inds = np.array([])    
 
     
@@ -153,9 +172,11 @@ def main():
     dofs    = np.delete(dofs,statDataCl.inds)
     sza     = np.delete(sza,statDataCl.inds)
     rms     = np.delete(rms,statDataCl.inds)
-    tot_rnd = np.delete(tot_rnd,statDataCl.inds)
-    tot_sys = np.delete(tot_sys,statDataCl.inds)
-    tot_std = np.delete(tot_std,statDataCl.inds)
+    
+    if errorFlg:
+        tot_rnd = np.delete(tot_rnd,statDataCl.inds)
+        tot_sys = np.delete(tot_sys,statDataCl.inds)
+        tot_std = np.delete(tot_std,statDataCl.inds)
 
     YYYYMMDD = np.asarray(['{0:4d}-{1:02d}-{2:02d}'.format(dates[i].year, dates[i].month, dates[i].day)    for i,dum in enumerate(dates)])
     HHMMSS   = np.asarray(['{0:02d}:{1:02d}:{2:02d}'.format(dates[i].hour,dates[i].minute,dates[i].second) for i,dum in enumerate(dates)])
@@ -165,7 +186,7 @@ def main():
     # day of data
     #------------------------------------------
     idateStr    = '{0:04d}{1:02d}{2:02d}'.format(dates[0].year,dates[0].month,dates[0].day)
-    outFileName = outFileDir +'FL0-FTS-'+gasName.upper()+'_GROUND-BOULDER_'+idateStr+'_R1.ascii'
+    
     
     #----------------------------------------
     # Convert times to second since UTC start 
@@ -178,20 +199,34 @@ def main():
     #-----------------------------------
     dateNow = dt.datetime.now()
 
+    if loc.lower() == 'tab':
+        locStr = 'Thule, Greenland'
+    elif loc.lower() == 'mlo':
+        locStr = 'Mauna Loa, HI USA'
+    elif locc.lower() == 'fl0':
+        locStr = 'Boulder, Colorado USA'
+
     #--------------
     with open(outFileName,'w') as fopen:
-        fopen.write('#Hannigan, J.W., Ortega, I\n')
+        fopen.write('#Hannigan, J.W.; Ortega, I\n')
         fopen.write('#National Center for Atmospheric Research\n')
-        fopen.write('#Ground Based HR-FTIR Spectrometer at FL0 (Boulder Colorado\n')
+        fopen.write('#Ground Based HR-FTIR Spectrometer at {}\n'.format(locStr))
         fopen.write('#CONTACT_INFO: Hannigan, Jim, jamesw@ucar.edu, 303-497-1853, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
         fopen.write('#CONTACT_INFO: Ortega, Ivan, iortega@ucar.edu, 303-497-1861, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
         fopen.write('#Gas name, Version, ctlFile:{0}, {1}, {2}\n'.format( gasName.upper(), ver, ctlF ))
-        fopen.write('Index, YYYY-MM-DD, HH:MM:SS, TC [molecules cm^-2], Random_Err [molecules cm^-2], Systematic_Err [molecules cm^-2], Total_Err [molecules cm^-2], DOF [a.u], SZA [deg], RMS [%]\n')
+        if errorFlg: 
+            #fopen.write('Index, YYYY-MM-DD, HH:MM:SS, TC [molecules cm^-2], Random_Err [molecules cm^-2], Systematic_Err [molecules cm^-2], Total_Err [molecules cm^-2], DOF [a.u], SZA [deg], RMS [%]\n')
+            fopen.write('Index, YYYY-MM-DD, HH:MM:SS, TC [mm], Random_Err [mm], Systematic_Err [mm], Total_Err [mm], DOF [a.u], SZA [deg], RMS [%]\n')
+            strFormat = '{0:d}, {1:>10s}, {2:>10s}, {3:.3E}, {4:.3E}, {5:.3E}, {6:.3E}, {7:.3f}, {8:.3f}, {9:.3f}\n'
+        else:  
+            fopen.write('Index, YYYY-MM-DD, HH:MM:SS, TC [molecules cm^-2], DOF [a.u], SZA [deg], RMS [%]\n')
+            strFormat = '{0:d}, {1:>10s}, {2:>10s}, {3:.3E}, {4:.3f}, {5:.3f}, {6:.3f}\n'
 
-        strFormat = '{0:d}, {1:>10s}, {2:>10s}, {3:.3E}, {4:.3E}, {5:.3E}, {6:.3E}, {7:.3f}, {8:.3f}, {9:.3f}\n'
 
         for i,sngTime in enumerate(times):
-            fopen.write(strFormat.format((i+1),YYYYMMDD[i], HHMMSS[i] ,totClmn[i],tot_rnd[i],tot_sys[i],tot_std[i],dofs[i],sza[i],rms[i]))
+            #if errorFlg: fopen.write(strFormat.format((i+1),YYYYMMDD[i], HHMMSS[i] ,totClmn[i],tot_rnd[i],tot_sys[i],tot_std[i],dofs[i],sza[i],rms[i]))
+            if errorFlg: fopen.write(strFormat.format((i+1),YYYYMMDD[i], HHMMSS[i] ,totClmn[i]*2.989e-22,tot_rnd[i]*2.989e-22,tot_sys[i]*2.989e-22,tot_std[i]*2.989e-22,dofs[i],sza[i],rms[i]))
+            else: fopen.write(strFormat.format((i+1),YYYYMMDD[i], HHMMSS[i] ,totClmn[i],dofs[i],sza[i],rms[i]))
     
 
     #-----------------
@@ -199,45 +234,58 @@ def main():
     #-----------------
     years   = YearLocator()
     months  = MonthLocator()
-    #DateFmt = DateFormatter('%Y-%m')
+    DateFmt = DateFormatter('%Y-%m')
     #DateFmt      = DateFormatter('%b %d')
-    DateFmt      = DateFormatter('%H:%M')
+    #DateFmt      = DateFormatter('%H:%M')
     
     fig,(ax1,ax2,ax3,ax4) = plt.subplots(4, figsize=(10,10), sharex=True)
     
-    ax1.plot(dates,totClmn,'r-o')
-    ax1.errorbar(dates,totClmn, yerr=tot_std, fmt='o', markersize=0, color='r', ecolor='r')
+    #ax1.scatter(dates,totClmn*2.989e-22, facecolors='red', s=30, label='data', color='k')
+    if errorFlg: ax1.errorbar(dates,totClmn*2.989e-22, yerr=tot_std*2.989e-22, fmt='o', markersize=5, color='r', ecolor='r')
+    else: ax1.errorbar(dates,totClmn, yerr=totClmn*0., fmt='o', markersize=0, color='r', ecolor='r')
+    
     ax1.grid(True)
-    ax1.set_ylabel('Retrieved Total Column\n[molecules cm$^{-2}$]', multialignment='center', fontsize=14)
-    ax1.set_title(gasName.upper() + ' For ' + loc.upper(), fontsize=14 )
+    #ax1.set_ylabel('Retrieved Total Column\n[molecules cm$^{-2}$]', multialignment='center', fontsize=14)
+    ax1.set_ylabel('Total Column [mm]', multialignment='center', fontsize=14)
+    #ax1.set_title(gasName.upper() + ' For ' + loc.upper(), fontsize=14 )
     ax1.tick_params(labelsize=14)
     
-    ax2.plot(dates,dofs,'r-o')
+    #ax2.plot(dates,dofs,'r-o')
+    ax2.scatter(dates,dofs, facecolors='red', s=30, label='data', color='k')
     ax2.grid(True)
-    ax2.set_ylabel('Degrees of Freedom', fontsize=14)
+    ax2.set_ylabel('DOF', fontsize=14)
     ax2.tick_params(labelsize=14)
     
-    ax3.plot(dates,sza,'r-o')
+    #ax3.plot(dates,sza,'r-o')
+    ax3.scatter(dates,sza, facecolors='red', s=30, label='data', color='k')
     ax3.grid(True)
-    ax3.set_ylabel('Solar Zenith Angle\n[Degrees]', multialignment='center', fontsize=14)
+    ax3.set_ylabel('SZA [Degrees]', multialignment='center', fontsize=14)
     ax3.tick_params(labelsize=14)
     
-    ax4.plot(dates,rms,'r-o')
+    #ax4.plot(dates,rms,'r-o')
+    ax4.scatter(dates,rms, facecolors='red', s=30, label='data', color='k')
     ax4.grid(True)
-    ax4.set_ylabel('Fit RMS', fontsize=14)
+    ax4.set_ylabel('RMS', fontsize=14)
     ax4.tick_params(labelsize=14)    
     
     #ax4.xaxis.set_major_locator(years)
     #ax4.xaxis.set_minor_locator(months)
     ax4.xaxis.set_major_formatter(DateFmt)
     ax4.set_xlabel('Date', fontsize=14)
-
-    fig.subplots_adjust(bottom=0.08, top=0.95, left = 0.13, right = 0.97)
     
-    #fig.autofmt_xdate()
-    plt.show(block=False)
-    user_input = raw_input('Press any key to exit >>> ')
-    sys.exit()
+    fig.autofmt_xdate()
+    plt.suptitle('Time series of {} at {}'.format(gasName.upper(), locStr), fontsize=16)
+    fig.subplots_adjust(bottom=0.1, top=0.95, left = 0.13, right = 0.97)
+
+    if saveFlg:     
+        pdfsav.savefig(fig,dpi=200)
+    else:           
+        plt.show(block=False)
+        user_input = raw_input('Press any key to exit >>> ')
+        sys.exit()
+
+    if saveFlg:     
+        pdfsav.close()
             
                                                                                     
 if __name__ == "__main__":

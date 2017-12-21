@@ -85,24 +85,24 @@ def main():
     #-------------------------------------
     #three letter ID
     #-------------------------------------
-    #locs         = ['jfj', 'wlo']
+    #locs         = ['eur']
     #locs         = ['kir', 'iza', 'bld', 'stp', 'jfj', 'wlo']
-    locs         = ['bld', 'wlo', 'jfj', 'mlo', 'tab', 'tor', 'tor', 'stp', 'ldr', 'rkb', 'tsk', 'ldr', 'mai', 'std', 'zgp', 'kir', 'iza', 'par', 'bre', 'nya', 'pmb']
+    locs         = ['bld', 'wlo', 'jfj', 'mlo', 'tab', 'tor', 'eur', 'stp', 'ldr', 'rkb', 'tsk', 'ldr', 'mai', 'std', 'zgp', 'kir', 'iza', 'par', 'bre', 'nya', 'pmb', 'alt']
 
     #-------------------------------------
     #ID in the HDF Files
     #-------------------------------------
-    #locID        = ['jungfraujoch', 'wollongong']
+    locID        = ['_eureka_']
     #locID        = ['kiruna', 'izana', 'boulder', 'st.petersburg', 'jungfraujoch', 'wollongong']
     locID        = ['boulder', 'wollongong', 'jungfraujoch', 'mauna.loa.h', 'thule', '_toronto_', '_eureka_', 'st.petersburg', 'laud_120hr', 'rikubetsu', 
-                   'tsukuba', 'ahts',  'maido' , 'stdenis', 'zugspitze', 'kiruna', 'izana', 'paris', 'bremen', 'ny.alesund', 'paramaribo']                       
+                   'tsukuba', 'ahts',  'maido' , 'stdenis', 'zugspitze', 'kiruna', 'izana', 'paris', 'bremen', 'ny.alesund', 'paramaribo', 'altzomoni']                       
     #-------------------------------------
     #Names in Plots
     #-------------------------------------   
-    #pltID        = [ 'Jungfraujoch', 'Wollongong']
+    #pltID        = [ 'Eureka']
     #pltID        = ['Kiruna', 'Izana', 'Boulder', 'St Petersburg', 'Jungfraujoch', 'Wollongong']
     pltID        = ['Boulder', 'Wollongong', 'Jungfraujoch', 'Mauna Loa', 'Thule', 'Toronto', 'Eureka', 'St Petersburg', 'Lauder', 'Rikubetsu', 
-                   'Tsukuba', 'AHTS', 'Maido', 'St Denis', 'Zugspitze', 'Kiruna', 'Izana', 'Paris', 'Bremen', 'Ny Alesund', 'Paramaribo'] 
+                   'Tsukuba', 'AHTS', 'Maido', 'StD-Maido', 'Zugspitze', 'Kiruna', 'Izana', 'Paris', 'Bremen', 'Ny Alesund', 'Paramaribo', 'Altzomoni'] 
      
     #-------------------------------------
     #Inputs
@@ -112,7 +112,7 @@ def main():
     #------
     # Flags
     #------
-    saveFlg       = True                  # Flag to either save data to pdf file (saveFlg=True) or plot to screen (saveFlg=False)
+    saveFlg       = False                  # Flag to either save data to pdf file (saveFlg=True) or plot to screen (saveFlg=False)
     errorFlg      = False                  # Flag to process error data
     fltrFlg       = True                   # Flag to filter the data
 
@@ -141,8 +141,8 @@ def main():
 
     pColsFlg      = True                   #Calculate tropospheric and stratospheric columns?
 
-    pltPcol       = True                  #plot the time series in partial columns
-    pltWvmr       = False                   #plot the time series in weighted VMR
+    pltPcol       = False                  #plot the time series in partial columns
+    pltWvmr       = True                   #plot the time series in weighted VMR
     
     Adth          = 16.0                   #Altitude in km of tropopause in case NCEP or DTH is not available
     offH          = 5.0                    #Additional altitude above the tropopause height
@@ -317,7 +317,7 @@ def main():
             avkTC[idhdf]        = statDataCl[idhdf].HDF[statDataCl[idhdf].PrimaryGas.upper()+'.'+statDataCl[idhdf].getColumnAbsorptionSolarAvkName()]
         else:
             avkVMR[idhdf]  = np.empty([nobs,n_layer,n_layer])
-            avKTC[idhdf]   = np.empty([nobs,n_layer,n_layer])
+            avkTC[idhdf]   = np.empty([nobs,n_layer,n_layer])
             avkVMR[idhdf].fill('nan')
             avkTC[idhdf].fill('nan')
 
@@ -346,9 +346,9 @@ def main():
 
         print '\n'
         print idhdf
-        print 'Latitude          = {}'.format(Lat_i[0])
-        print 'Longitude         = {}'.format(Lon_i[0])
-        print 'Altitude of Instr = {}'.format(alt_instru[0])
+        print 'Latitude          = {0:.2f}'.format(Lat_i[0])
+        print 'Longitude         = {0:.2f}'.format(Lon_i[0])
+        print 'Altitude of Instr = {0:.2f}'.format(alt_instru[0])
 
         #----------------------------------------
         #PROFFIT IS A LEVEL-BASED & SFIT IS LAYER-BASED: THEY DEFINE THE ALTITUDE AND BOUNDARY VARIABLES DIFFERENT
@@ -548,7 +548,7 @@ def main():
             meanTpp      = np.mean(AvgTpp)
             stdTpp       = np.std(AvgTpp)
 
-            print '\nMean TPH: {} +/- {}'.format(meanTpp, stdTpp)
+            print '\nMean TPH: {0:.2f} +/- {1:.2f}'.format(meanTpp, stdTpp)
 
             #----------------------------------------------------
             #
@@ -578,8 +578,8 @@ def main():
                 stdTpp  = 1.32
 
             elif (float(Lat_i[0]) >= -25.0) & (float(Lat_i[0]) < 25.0):
-                meanTpp = 16.43
-                stdTpp  = 0.4
+                meanTpp = 16.46
+                stdTpp  = 0.42
 
             elif (float(Lat_i[0]) >= -40.0) & (float(Lat_i[0]) < -25.0):
                 meanTpp = 12.31
@@ -613,7 +613,7 @@ def main():
                 #---------------------------------------------------
                 #THESE SITES REPORT INCREASING ALTITUDE
                 #---------------------------------------------------
-                if (idhdf == 'Kiruna') or (idhdf == 'Izana') or (idhdf == 'Paris'):       
+                if (idhdf == 'Kiruna') or (idhdf == 'Izana') or (idhdf == 'Paris') or (idhdf == 'Altzomoni'):       
                     
                     rPcol[idhdf+str(pc)]  = np.sum(rPrfMol[idhdf][:,ind1:ind2], axis=1)
                     aPcol[idhdf+str(pc)]  = np.sum(aPrfMol[idhdf][:,ind1:ind2], axis=1)
@@ -687,56 +687,94 @@ def main():
         totWvmr[idhdf]  = np.average(rPrf[idhdf], axis=1, weights=AirMPrf[idhdf])
         atotWvmr[idhdf] = np.average(aPrf[idhdf], axis=1, weights=AirMPrf[idhdf])
 
+    #----------------------------
+    #CONCATENATE st denis and maido
+    #---------------------------- 
+    dates2        = {}
+    
+    PcolTrop12     = {}
+    PcolTrop22     = {}
+    PcolStrat2    = {}
+    
+    PcolTropapr12  = {}
+    PcolTropapr22  = {}
+    PcolStratapr2 = {}
 
-    # #----------------------------
-    # #CONCATENATE st denis and maido
-    # #----------------------------            
-    # dates2        = {}
-    # PcolTrop2     = {}
-    # PcolStrat2    = {}
-    # PcolTropapr2  = {}
-    # PcolStratapr2 = {}
+    WvmrTrop12     = {}
+    WvmrTrop22     = {}
+    WvmrStrat2    = {}
+    
+    WvmrTropapr12  = {}
+    WvmrTropapr22  = {}
+    WvmrStratapr2 = {}
 
-    # WvmrTrop2     = {}
-    # WvmrStrat2    = {}
-    # WvmrTropapr2  = {}
-    # WvmrStratapr2 = {}
+    totClmn2        = {}
 
-    # pltID2        = []
-    # Lat2          = []
+    dtp2           = {}
+    alttpp12        = {}
+    alttpp22       = {}
 
-    # for i, idhdf in enumerate(pltID):
+    pltID2        = []
+    Lat2          = []
+    Lon2          = []
 
-    #     #if idhdf == 'Maido': continue
+    for i, idhdf in enumerate(pltID):
+
+        if idhdf == 'Maido': continue
         
-    #     if idhdf  == 'St Denis':
-    #         dates2[idhdf]          = np.concatenate( (dates[idhdf], dates['Maido']))
-    #         PcolTrop2[idhdf]       = np.concatenate( (PcolTrop[idhdf], PcolTrop['Maido']))
-    #         PcolStrat2[idhdf]      = np.concatenate( (PcolStrat[idhdf], PcolStrat['Maido']))
-    #         PcolTropapr2[idhdf]    = np.concatenate( (PcolTropapr[idhdf], PcolTropapr['Maido']))
-    #         PcolStratapr2[idhdf]   = np.concatenate( (PcolStratapr[idhdf], PcolStratapr['Maido']))
+        if idhdf  == 'StD-Maido':
+            dates2[idhdf]          = np.concatenate( (dates[idhdf], dates['Maido']))
 
-    #         WvmrTrop2[idhdf]       = np.concatenate( (WvmrTrop[idhdf], WvmrTrop['Maido']))
-    #         WvmrStrat2[idhdf]      = np.concatenate( (WvmrStrat[idhdf], WvmrStrat['Maido']))
-    #         WvmrTropapr2[idhdf]    = np.concatenate( (WvmrTropapr[idhdf], WvmrTropapr['Maido']))
-    #         WvmrStratapr2[idhdf]   = np.concatenate( (WvmrStratapr[idhdf], WvmrStratapr['Maido']))
+            totClmn2[idhdf]       = np.concatenate( (totClmn[idhdf], totClmn['Maido']))
 
-    #         pltID2.append(pltID[i])
-    #         Lat2.append(Lat[i])
-    #     else:
-    #         dates2[idhdf]         = dates[idhdf]
-    #         PcolTrop2[idhdf]      = PcolTrop[idhdf] 
-    #         PcolStrat2[idhdf]     = PcolStrat[idhdf]
-    #         PcolTropapr2[idhdf]   = PcolTropapr[idhdf]
-    #         PcolStratapr2[idhdf]  = PcolStratapr[idhdf]
 
-    #         WvmrTrop2[idhdf]      = WvmrTrop[idhdf] 
-    #         WvmrStrat2[idhdf]     = WvmrStrat[idhdf]
-    #         WvmrTropapr2[idhdf]   = WvmrTropapr[idhdf]
-    #         WvmrStratapr2[idhdf]  = WvmrStratapr[idhdf]
+            PcolTrop12[idhdf]       = np.concatenate( (PcolTrop1[idhdf], PcolTrop1['Maido']))
+            PcolTrop22[idhdf]       = np.concatenate( (PcolTrop2[idhdf], PcolTrop2['Maido']))
+            PcolStrat2[idhdf]      = np.concatenate( (PcolStrat[idhdf], PcolStrat['Maido']))
+            
+            PcolTropapr12[idhdf]    = np.concatenate( (PcolTropapr1[idhdf], PcolTropapr1['Maido']))
+            PcolTropapr22[idhdf]    = np.concatenate( (PcolTropapr2[idhdf], PcolTropapr2['Maido']))
+            PcolStratapr2[idhdf]   = np.concatenate( (PcolStratapr[idhdf], PcolStratapr['Maido']))
 
-    #         pltID2.append(pltID[i])
-    #         Lat2.append(Lat[i])
+            WvmrTrop12[idhdf]       = np.concatenate( (WvmrTrop1[idhdf], WvmrTrop1['Maido']))
+            WvmrTrop22[idhdf]       = np.concatenate( (WvmrTrop2[idhdf], WvmrTrop2['Maido']))
+            WvmrStrat2[idhdf]      = np.concatenate( (WvmrStrat[idhdf], WvmrStrat['Maido']))
+            
+            WvmrTropapr12[idhdf]    = np.concatenate( (WvmrTropapr1[idhdf], WvmrTropapr1['Maido']))
+            WvmrTropapr22[idhdf]    = np.concatenate( (WvmrTropapr2[idhdf], WvmrTropapr2['Maido']))
+            WvmrStratapr2[idhdf]   = np.concatenate( (WvmrStratapr[idhdf], WvmrStratapr['Maido']))
+
+            dtp2[idhdf]              = np.concatenate( (dtp[idhdf], dtp['Maido']))
+            alttpp12[idhdf]           = np.concatenate( (alttpp[idhdf], alttpp['Maido']))
+            alttpp22[idhdf]           = np.concatenate( (alttpp2[idhdf], alttpp2['Maido']))
+
+            pltID2.append(pltID[i])
+            Lat2.append(Lat[i])
+            Lon2.append(Lon[i])
+        else:
+            dates2[idhdf]         = dates[idhdf]
+            totClmn2[idhdf]       = totClmn[idhdf]
+            PcolTrop12[idhdf]     = PcolTrop1[idhdf] 
+            PcolTrop22[idhdf]     = PcolTrop2[idhdf] 
+            PcolStrat2[idhdf]     = PcolStrat[idhdf]
+            PcolTropapr12[idhdf]   = PcolTropapr1[idhdf]
+            PcolTropapr22[idhdf]   = PcolTropapr2[idhdf]
+            PcolStratapr2[idhdf]  = PcolStratapr[idhdf]
+
+            WvmrTrop12[idhdf]      = WvmrTrop1[idhdf] 
+            WvmrTrop22[idhdf]      = WvmrTrop2[idhdf] 
+            WvmrStrat2[idhdf]     = WvmrStrat[idhdf]
+            WvmrTropapr12[idhdf]   = WvmrTropapr1[idhdf]
+            WvmrTropapr22[idhdf]   = WvmrTropapr2[idhdf]
+            WvmrStratapr2[idhdf]  = WvmrStratapr[idhdf]
+
+            dtp2[idhdf]            = dtp[idhdf]
+            alttpp12[idhdf]        = alttpp[idhdf]
+            alttpp22[idhdf]        = alttpp2[idhdf]
+
+            pltID2.append(pltID[i])
+            Lat2.append(Lat[i])
+            Lon2.append(Lon[i])
 
     #----------------------------------------------------------------------------------------------------------------------------------------------------------------
     #                                                           PLOTS
@@ -752,7 +790,7 @@ def main():
     years  = []
     Nyears = []
 
-    for i, idhdf in enumerate(statDataCl):
+    for i, idhdf in enumerate(pltID):
         years.append([ singDate.year for singDate in dates[idhdf]] )
     years = np.asarray(years)
 
@@ -779,13 +817,17 @@ def main():
     pltID = [y for (x,y) in sorted(zip(Lat,pltID), reverse=True)]
     Lon = [y for (x,y) in sorted(zip(Lat,Lon), reverse=True)]
     Lat   = sorted(Lat, reverse=True)
+    pltID = np.asarray(pltID)
 
-    pltID        = np.asarray(pltID)
+    pltID2 = [y for (x,y) in sorted(zip(Lat2,pltID2), reverse=True)]
+    Lon2 = [y for (x,y) in sorted(zip(Lat2,Lon2), reverse=True)]
+    Lat2   = sorted(Lat2, reverse=True)
+    pltID2 = np.asarray(pltID2)
 
     
-    # #---------------------------------------------------
-    # # Map with Sites
-    # #---------------------------------------------------
+    #---------------------------------------------------
+    # Map with Sites
+    #---------------------------------------------------
     fig = plt.figure(figsize=(11,7))
 
     eq_map = Basemap(projection='robin', resolution = 'l', area_thresh = 1000.0, lat_0=0, lon_0=-130)
@@ -812,8 +854,8 @@ def main():
     #---------------------------------------------------
     # Defining variable for plots
     #---------------------------------------------------
-    npanels   = len(locID)
-    npanels2  = int(math.ceil(npanels/3.0))
+    npanels   = len(pltID)
+    npanels2  = int(math.ceil(npanels/4.0))
     xmin      = dt.date(iyear, imonth, iday)
     xmax      = dt.date(fyear, fmonth, fday)
     clmap     = 'jet'
@@ -821,9 +863,9 @@ def main():
     #---------------------------------------------------
     # Mean vertical profiles
     #---------------------------------------------------
-    fig = plt.figure(figsize=(10,12))
+    fig = plt.figure(figsize=(12,12))
 
-    outer_grid = gridspec.GridSpec(npanels2, 3, wspace=0.11, hspace=0.085)
+    outer_grid = gridspec.GridSpec(npanels2, 4, wspace=0.11, hspace=0.085)
 
     for i, idhdf in enumerate(pltID):
 
@@ -926,11 +968,48 @@ def main():
         #user_input = raw_input('Press any key to exit >>> ')
         #sys.exit()
 
+    #----------------------------
+    #CONCATENATE st denis and maido
+    #---------------------------- 
+    # Lat = [li for i, li in enumerate(Lat) if (pltID[i] != 'Maido') & (pltID[i] != 'St Denis')]
+    # Lon = [li for i, li in enumerate(Lon) if (pltID[i] != 'Maido') & (pltID[i] != 'St Denis')]
+
+    # pltID = [i for i in pltID if (i != 'Maido') & (i != 'St Denis')]
+
+    # pltID.append('MaSDenis')
+    # Lat.append(-21.08)
+    # Lon.append(55.38)
+
+    # dates['MaSDenis']         = np.concatenate( (dates['Maido'], dates['St Denis']))
+
+    # PcolTrop1['MaSDenis']     = np.concatenate( (PcolTrop1['St Denis'], PcolTrop1['Maido']))
+    # PcolTrop2['MaSDenis']     = np.concatenate( (PcolTrop2['St Denis'], PcolTrop2['Maido']))
+    # PcolStrat['MaSDenis']     = np.concatenate( (PcolStrat['St Denis'], PcolStrat['Maido']))
+   
+    # PcolTropapr1['MaSDenis']  = np.concatenate( (PcolTropapr1['St Denis'], PcolTropapr1['Maido']))
+    # PcolTropapr2['MaSDenis']  = np.concatenate( (PcolTropapr2['St Denis'], PcolTropapr2['Maido']))
+    # PcolStratapr['MaSDenis']  = np.concatenate( (PcolStratapr['St Denis'], PcolStratapr['Maido']))
+
+    # WvmrTrop1['MaSDenis']     = np.concatenate( (WvmrTrop1['St Denis'], WvmrTrop1['Maido']))
+    # WvmrTrop2['MaSDenis']     = np.concatenate( (WvmrTrop2['St Denis'], WvmrTrop2['Maido']))
+    # WvmrStrat['MaSDenis']     = np.concatenate( (WvmrStrat['St Denis'], WvmrStrat['Maido']))
+    
+    # WvmrTropapr1['MaSDenis']  = np.concatenate( (WvmrTropapr1['St Denis'], WvmrTropapr1['Maido']))
+    # WvmrTropapr2['MaSDenis']  = np.concatenate( (WvmrTropapr2['St Denis'], WvmrTropapr2['Maido']))
+    # WvmrStratapr['MaSDenis']  = np.concatenate( (WvmrStratapr['St Denis'], WvmrStratapr['Maido']))
+
+    # dtp['MaSDenis']  = np.concatenate( (dtp['St Denis'], dtp['Maido']))
+
+    # alttpp['MaSDenis']  = np.concatenate( (alttpp['St Denis'], alttpp['Maido']))
+    # alttpp2['MaSDenis']  = np.concatenate( (alttpp2['St Denis'], alttpp2['Maido']))
+
+    npanels2  = int(math.ceil(npanels/3.0))
+
     #---------------------------------------------------
     # Tropopause Height
     #---------------------------------------------------
     print '\nPlot: Tropopause height:\n' 
-    resTH = AnalTS(npanels2, dates, dtp, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Tropopause height', unitsStr=' km', yData2=alttpp, yData3=alttpp2, yData4=dtp, ymin=4 ,ymax=19)
+    resTH = AnalTS(npanels2-1, dates2, dtp2, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Tropopause height', unitsStr=' km', yData2=alttpp12, yData3=alttpp22, yData4=dtp2, ymin=4 ,ymax=19)
     resTH = np.asarray(resTH)
     
     if pltPcol:
@@ -946,7 +1025,7 @@ def main():
         # Time Series of Total Columns (multiple panels) -- Averaged values
         #---------------------------------------------------
         print '\nPlot: Averaged Total Columns:\n' 
-        resTC = AnalTS(npanels2, dates, totClmn, pltID, Lat, fits=True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Total Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$', ymin=5.0 ,ymax=11)
+        resTC = AnalTS(npanels2-1, dates2, totClmn2, pltID2, Lat2, fits=True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Total Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$', ymin=5.0 ,ymax=11)
         resTC = np.asarray(resTC)
 
         #---------------------------------------------------
@@ -963,33 +1042,34 @@ def main():
             # Boundary Layer Columns ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Boundary Layer Column:\n' 
-            resLC = AnalTS(npanels2, dates, PcolTrop1, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.9 ,ymax=6.0)
+            resLC = AnalTS(npanels2-1, dates2, PcolTrop12, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.9 ,ymax=6.0)
             resLC = np.asarray(resLC)
 
             print '\nPlot: Boundary Layer Column Anomalies:\n' 
-            resLCAnom = AnalTSAnom(npanels2, dates, PcolTrop1, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
+            resLCAnom = AnalTSAnom(npanels2-1, dates2, PcolTrop12, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
             resLCAnom = np.asarray(resLCAnom)
+
 
             #---------------------------------------------------
             # Free Tropospheric Columns ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Free Tropospheric Column:\n' 
-            resLC2 = AnalTS(npanels2, dates, PcolTrop2, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.9, ymax=6.0)
+            resLC2 = AnalTS(npanels2-1, dates2, PcolTrop22, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.9, ymax=6.0)
             resLC2 = np.asarray(resLC2)
 
             print '\nPlot: Boundary Layer Column Anomalies:\n' 
-            resLC2Anom = AnalTSAnom(npanels2, dates, PcolTrop2, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
+            resLC2Anom = AnalTSAnom(npanels2-1, dates2, PcolTrop22, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
             resLC2Anom = np.asarray(resLC2Anom)
 
             #---------------------------------------------------
             # Stratospheric Columns ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Stratospheric Column:\n' 
-            resSC = AnalTS(npanels2, dates, PcolStrat, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.001 ,ymax=2.5)
+            resSC = AnalTS(npanels2-1, dates2, PcolStrat2, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Partial Column', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')#, ymin=0.001 ,ymax=2.5)
             resSC = np.asarray(resSC)
 
             print '\nPlot: Stratospheric Column Anomalies:\n' 
-            resSCAnom = AnalTSAnom(npanels2, dates, PcolStrat, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
+            resSCAnom = AnalTSAnom(npanels2-1, dates2, PcolStrat2, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Partial Column Anomalies', unitsStr=TCsclfctName+' molecules$\cdot$cm$^{-2}$')
             resSCAnom = np.asarray(resSCAnom)
 
             #---------------------------------------------------
@@ -1077,14 +1157,14 @@ def main():
             # #sys.exit()
 
             #---------------------------------------------------
-            # Plot total Weighted VMR by month
+            # Plot total Columns by month
             #---------------------------------------------------
             print '\nPlot: Monthly mean Partial Columns:\n' 
             fig, ax  = plt.subplots(3, 5, figsize=(17, 10), sharey=False, sharex=True)
             
-            for i, idhdf in enumerate(pltID):
+            for i, idhdf in enumerate(pltID2):
 
-                month    = np.array([d.month for d in dates[idhdf]])
+                month    = np.array([d.month for d in dates2[idhdf]])
                 mnthSort = list(set(month))
                 
                 mnthMean = np.zeros(len(mnthSort))
@@ -1098,14 +1178,14 @@ def main():
                 
                 for j,m in enumerate(mnthSort):
                     inds        = np.where(month == m)[0]
-                    mnthMean[j] = np.mean(PcolTrop1[idhdf][inds])
-                    mnthSTD[j]  = np.std(PcolTrop1[idhdf][inds])
+                    mnthMean[j] = np.mean(PcolTrop12[idhdf][inds])
+                    mnthSTD[j]  = np.std(PcolTrop12[idhdf][inds])
 
-                    mnthMean2[j] = np.mean(PcolTrop2[idhdf][inds])
-                    mnthSTD2[j]  = np.std(PcolTrop2[idhdf][inds])
+                    mnthMean2[j] = np.mean(PcolTrop22[idhdf][inds])
+                    mnthSTD2[j]  = np.std(PcolTrop22[idhdf][inds])
 
-                    mnthMean3[j] = np.mean(PcolStrat[idhdf][inds])
-                    mnthSTD3[j]  = np.std(PcolStrat[idhdf][inds])
+                    mnthMean3[j] = np.mean(PcolStrat2[idhdf][inds])
+                    mnthSTD3[j]  = np.std(PcolStrat2[idhdf][inds])
 
                 Lat[i] = float(Lat[i])
 
@@ -1220,8 +1300,8 @@ def main():
             # Bar plot: Three different periods ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Trends Columns:\n'
-            hbarplt3(resLC, resLC2, resSC, pltID, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval', saveFlg=saveFlg, pdfsav=pdfsav)
-            hbarplt3(resLCAnom, resLC2Anom, resSCAnom, pltID, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval - Anomalies', saveFlg=saveFlg, pdfsav=pdfsav)
+            hbarplt3(resLC, resLC2, resSC, pltID2, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval', saveFlg=saveFlg, pdfsav=pdfsav)
+            hbarplt3(resLCAnom, resLC2Anom, resSCAnom, pltID2, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval - Anomalies', saveFlg=saveFlg, pdfsav=pdfsav)
 
             #---------------------------------------------------
             # Bar plot: Three different periods ==> Apriori
@@ -1327,7 +1407,7 @@ def main():
             #Hemispheric Columns
             #---------------------------------------------------
             print '\nPlot: Hemispheric Differences:\n'
-            Lat = np.asarray(Lat)
+            Lat2 = np.asarray(Lat2)
             
             LatBin = range(-90, 100, 10)
             LatMid = [(i+i+10)*0.5 for i in LatBin[:-1]]
@@ -1341,7 +1421,7 @@ def main():
             PCSCBin_e = []
 
             for i in range(len(LatMid)):
-                inds = np.where( (Lat >= LatBin[i]) & (Lat < LatBin[i+1]))[0]
+                inds = np.where( (Lat2 >= LatBin[i]) & (Lat2 < LatBin[i+1]))[0]
 
                 if len(inds) > 1:
                     PCLCBin.append(np.mean(resLC[9][inds]))
@@ -1433,9 +1513,9 @@ def main():
         #---------------------------------------------------
         # Time Series of Total Weighted VMR  (multiple panels) -- Averaged values
         #---------------------------------------------------
-        print '\nPlot: Averaged WEIGHTED VMR:\n' 
-        resvmrTC = AnalTS(npanels2, dates, totWvmr, pltID, Lat, fits=True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Weighted VMR', unitsStr=sclfctName, ymin=340 ,ymax=600)
-        resvmrTC = np.asarray(resvmrTC)
+        #print '\nPlot: Averaged WEIGHTED VMR:\n' 
+        #resvmrTC = AnalTS(npanels2-1, dates2, totWvmr2, pltID2, Lat2, fits=True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Weighted VMR', unitsStr=sclfctName, ymin=340 ,ymax=600)
+        #resvmrTC = np.asarray(resvmrTC)
 
         #---------------------------------------------------
         # Time Series of Total Weighted VMR Apriori (multiple panels) -- Averaged values
@@ -1450,11 +1530,11 @@ def main():
             # Tropospheric Weighted VMR ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Tropospheric Weighted VMR:\n' 
-            resvmrLC = AnalTS(npanels2, dates, WvmrTrop1, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Weighted VMR', unitsStr=sclfctName)#, ymin=340 ,ymax=600)
+            resvmrLC = AnalTS(npanels2-1, dates2, WvmrTrop12, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Weighted VMR', unitsStr=sclfctName)#, ymin=340 ,ymax=600)
             resvmrLC = np.asarray(resvmrLC)
 
             print '\nPlot: Tropospheric Weighted VMR Anomalies:\n' 
-            resvmrLCAnom = AnalTSAnom(npanels2, dates, WvmrTrop1, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Weighted VMR Anomalies', unitsStr=sclfctName)
+            resvmrLCAnom = AnalTSAnom(npanels2-1, dates2, WvmrTrop12, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Low Tropospheric Weighted VMR Anomalies', unitsStr=sclfctName)
             resvmrLCAnom = np.asarray(resvmrLCAnom)
 
             
@@ -1462,23 +1542,29 @@ def main():
             # Free Tropospheric Weighted VMR ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Free Tropospheric Weighted VMR:\n' 
-            resvmrLC2 = AnalTS(npanels2, dates, WvmrTrop2, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column', unitsStr=sclfctName)#, ymin=0.9, ymax=6.0)
+            resvmrLC2 = AnalTS(npanels2-1, dates2, WvmrTrop22, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column', unitsStr=sclfctName)#, ymin=0.9, ymax=6.0)
             resvmrLC2 = np.asarray(resvmrLC2)
 
             print '\nPlot: Free Tropospheric Weighted VMR Anomalies:\n' 
-            resvmrLCAnom2 = AnalTSAnom(npanels2, dates, WvmrTrop2, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column Anomalies', unitsStr=sclfctName)
+            resvmrLCAnom2 = AnalTSAnom(npanels2-1, dates2, WvmrTrop22, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Free Tropospheric Partial Column Anomalies', unitsStr=sclfctName)
             resvmrLCAnom2 = np.asarray(resvmrLCAnom2)
+
+            user_input = raw_input('Press any key to exit >>> ')
+            sys.exit()
 
             #---------------------------------------------------
             # Stratospheric Weighted VMR ==> Retrieval
             #---------------------------------------------------
             print '\nPlot: Stratospheric Weighted VMR:\n' 
-            resvmrSC = AnalTS(npanels2, dates, WvmrStrat, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Weighted VMR', unitsStr=sclfctName)#, ymin=50 ,ymax=450)
+            resvmrSC = AnalTS(npanels2-1, dates2, WvmrStrat2, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Weighted VMR', unitsStr=sclfctName)#, ymin=50 ,ymax=450)
             resvmrSC = np.asarray(resvmrSC)
 
             print '\nPlot: Stratospheric Weighted VMR Anomalies:\n' 
-            resvmrSCAnom = AnalTSAnom(npanels2, dates, WvmrStrat, pltID, Lat, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Weighted VMR Anomalies', unitsStr=sclfctName)
+            resvmrSCAnom = AnalTSAnom(npanels2-1, dates2, WvmrStrat2, pltID2, Lat2, fits = True, AvgType='Daily', pltFig=True, saveFlg=saveFlg, pdfsav=pdfsav, ytypeStr='Stratospheric Weighted VMR Anomalies', unitsStr=sclfctName)
             resvmrSCAnom = np.asarray(resvmrSCAnom)
+
+            #user_input = raw_input('Press any key to exit >>> ')
+            #sys.exit()
 
             #---------------------------------------------------
             # Tropospheric Weighted VMR ==> Apriori
@@ -1554,9 +1640,9 @@ def main():
             print '\nPlot: Monthly mean Partial Columns:\n' 
             fig, ax  = plt.subplots(3, 5, figsize=(17, 10), sharey=False, sharex=True)
            
-            for i, idhdf in enumerate(pltID):
+            for i, idhdf in enumerate(pltID2):
 
-                month    = np.array([d.month for d in dates[idhdf]])
+                month    = np.array([d.month for d in dates2[idhdf]])
                 mnthSort = list(set(month))
                 
                 mnthMean = np.zeros(len(mnthSort))
@@ -1570,18 +1656,18 @@ def main():
                 
                 for j,m in enumerate(mnthSort):
                     inds        = np.where(month == m)[0]
-                    mnthMean[j] = np.mean(WvmrTrop1[idhdf][inds])
-                    mnthSTD[j]  = np.std(WvmrTrop1[idhdf][inds])
+                    mnthMean[j] = np.mean(WvmrTrop12[idhdf][inds])
+                    mnthSTD[j]  = np.std(WvmrTrop12[idhdf][inds])
 
-                    mnthMean2[j] = np.mean(WvmrTrop2[idhdf][inds])
-                    mnthSTD2[j]  = np.std(WvmrTrop2[idhdf][inds])
+                    mnthMean2[j] = np.mean(WvmrTrop22[idhdf][inds])
+                    mnthSTD2[j]  = np.std(WvmrTrop22[idhdf][inds])
 
-                    mnthMean3[j] = np.mean(WvmrStrat[idhdf][inds])
-                    mnthSTD3[j]  = np.std(WvmrStrat[idhdf][inds])
+                    mnthMean3[j] = np.mean(WvmrStrat2[idhdf][inds])
+                    mnthSTD3[j]  = np.std(WvmrStrat2[idhdf][inds])
 
-                Lat[i] = float(Lat[i])
+                Lat2[i] = float(Lat2[i])
 
-                if Lat[i] >= 50.:     
+                if Lat2[i] >= 50.:     
                     ax[0,0].errorbar(mnthSort,mnthMean, fmt='o', yerr=mnthSTD ,markersize=6)
                     ax[1,0].errorbar(mnthSort,mnthMean2, fmt='o', yerr=mnthSTD2 ,markersize=6, label=idhdf)
                     ax[2,0].errorbar(mnthSort,mnthMean3, fmt='o', yerr=mnthSTD3 ,markersize=6)
@@ -1603,9 +1689,9 @@ def main():
 
                     ax[0, 0].set_ylim(350, 580)
                     ax[1, 0].set_ylim(350, 580)
-                    ax[2, 0].set_ylim(100, 350)
+                    ax[2, 0].set_ylim(100, 450)
                     
-                elif (Lat[i] >= 20.) & (Lat[i] < 50.):
+                elif (Lat2[i] >= 20.) & (Lat2[i] < 50.):
                     ax[0,1].errorbar(mnthSort,mnthMean, fmt='o', yerr=mnthSTD ,markersize=6)
                     ax[1,1].errorbar(mnthSort,mnthMean2, fmt='o', yerr=mnthSTD2 ,markersize=6, label=idhdf)
                     ax[2,1].errorbar(mnthSort,mnthMean3, fmt='o', yerr=mnthSTD3 ,markersize=6)
@@ -1622,9 +1708,9 @@ def main():
 
                     ax[0, 1].set_ylim(350, 580)
                     ax[1, 1].set_ylim(350, 580)
-                    ax[2, 1].set_ylim(100, 350)
+                    ax[2, 1].set_ylim(100, 450)
                    
-                elif (Lat[i] >= -20.)  & (Lat[i] < 20.):
+                elif (Lat2[i] >= -20.)  & (Lat2[i] < 20.):
                     ax[0,2].errorbar(mnthSort,mnthMean, fmt='o', yerr=mnthSTD ,markersize=6)
                     ax[1,2].errorbar(mnthSort,mnthMean2, fmt='o', yerr=mnthSTD2 ,markersize=6, label=idhdf)
                     ax[2,2].errorbar(mnthSort,mnthMean3, fmt='o', yerr=mnthSTD3 ,markersize=6)
@@ -1640,9 +1726,9 @@ def main():
 
                     ax[0, 2].set_ylim(350, 580)
                     ax[1, 2].set_ylim(350, 580)
-                    ax[2, 2].set_ylim(100, 350)
+                    ax[2, 2].set_ylim(100, 450)
                     
-                elif (Lat[i] >= -50.)  & (Lat[i] < -20.):
+                elif (Lat2[i] >= -50.)  & (Lat2[i] < -20.):
                     ax[0,3].errorbar(mnthSort,mnthMean, fmt='o', yerr=mnthSTD ,markersize=6)
                     ax[1,3].errorbar(mnthSort,mnthMean2, fmt='o', yerr=mnthSTD2 ,markersize=6, label=idhdf)
                     ax[2,3].errorbar(mnthSort,mnthMean3, fmt='o', yerr=mnthSTD3 ,markersize=6)
@@ -1659,10 +1745,10 @@ def main():
 
                     ax[0, 3].set_ylim(350, 580)
                     ax[1, 3].set_ylim(350, 580)
-                    ax[2, 3].set_ylim(100, 350)
+                    ax[2, 3].set_ylim(100, 450)
 
                     
-                elif (Lat[i] < -50.):
+                elif (Lat2[i] < -50.):
                     ax[0,4].errorbar(mnthSort,mnthMean, fmt='o', yerr=mnthSTD ,markersize=6)
                     ax[1,4].errorbar(mnthSort,mnthMean2, fmt='o', yerr=mnthSTD2 ,markersize=6, label=idhdf)
                     ax[2,4].errorbar(mnthSort,mnthMean3, fmt='o', yerr=mnthSTD3 ,markersize=6)
@@ -1678,7 +1764,7 @@ def main():
 
                     ax[0, 4].set_ylim(350, 580)
                     ax[1, 4].set_ylim(350, 580)
-                    ax[2, 4].set_ylim(100, 350)
+                    ax[2, 4].set_ylim(100, 450)
 
             fig.subplots_adjust(bottom=0.075,top=0.95, left=0.05, right=0.98, wspace=0.15, hspace=0.15)
            
@@ -1691,8 +1777,8 @@ def main():
             #---------------------------------------------------
             # Bar plot: Three different periods ==> Retrieval
             #---------------------------------------------------
-            hbarplt3(resvmrLC, resvmrLC2, resvmrSC, pltID, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval', saveFlg=saveFlg, pdfsav=pdfsav)
-            hbarplt3(resvmrLCAnom, resvmrLCAnom2, resvmrSCAnom, pltID, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval - Anomalies', saveFlg=saveFlg, pdfsav=pdfsav)
+            hbarplt3(resvmrLC, resvmrLC2, resvmrSC, pltID2, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval', saveFlg=saveFlg, pdfsav=pdfsav)
+            hbarplt3(resvmrLCAnom, resvmrLCAnom2, resvmrSCAnom, pltID2, b1_label='Low Tropospheric', b2_label='Free Tropospheric', b3_label='Stratospheric', subtitle='Retrieval - Anomalies', saveFlg=saveFlg, pdfsav=pdfsav)
 
 
             #---------------------------------------------------
@@ -1821,33 +1907,33 @@ def main():
             #Hemispheric Columns
             #---------------------------------------------------
             print '\nPlot: Hemispheric Differences:\n'
-            Lat = np.asarray(Lat)
+            Lat2 = np.asarray(Lat2)
 
             fig, (ax, ax2, ax3, ax4) = plt.subplots(4, 1, sharey=True, sharex=True, figsize=(7, 12))
 
             #ax.errorbar(Lat, resvmrTC[9], yerr=resvmrTC[10], fmt='o', color='red', ecolor='red', label ='Total')
-            ax.errorbar(Lat, resvmrLC[9], yerr=resvmrLC[10], fmt='o', color='red', ecolor='red', label ='Low Tropospheric')
-            ax.errorbar(Lat, resvmrLC2[9], yerr=resvmrLC2[10], fmt='o', color='blue', ecolor='blue', label= 'Free Tropospheric')
-            ax.errorbar(Lat, resvmrSC[9], yerr=resvmrSC[10], fmt='o', color='green', ecolor='green', label = 'Stratospheric')
+            ax.errorbar(Lat2, resvmrLC[9], yerr=resvmrLC[10], fmt='o', color='red', ecolor='red', label ='Low Tropospheric')
+            ax.errorbar(Lat2, resvmrLC2[9], yerr=resvmrLC2[10], fmt='o', color='blue', ecolor='blue', label= 'Free Tropospheric')
+            ax.errorbar(Lat2, resvmrSC[9], yerr=resvmrSC[10], fmt='o', color='green', ecolor='green', label = 'Stratospheric')
             ax.grid(True)
             ax.set_title('Years submitted', multialignment='center')
             ax.legend(prop={'size':8}, loc=4)
 
-            ax2.errorbar(Lat, resvmrLC[11], yerr=resvmrLC[12], fmt='o', color='red', ecolor='red')
-            ax2.errorbar(Lat, resvmrLC2[11], yerr=resvmrLC2[12], fmt='o', color='blue', ecolor='blue')
-            ax2.errorbar(Lat, resvmrSC[11], yerr=resvmrSC[12], fmt='o', color='green', ecolor='green')
+            ax2.errorbar(Lat2, resvmrLC[11], yerr=resvmrLC[12], fmt='o', color='red', ecolor='red')
+            ax2.errorbar(Lat2, resvmrLC2[11], yerr=resvmrLC2[12], fmt='o', color='blue', ecolor='blue')
+            ax2.errorbar(Lat2, resvmrSC[11], yerr=resvmrSC[12], fmt='o', color='green', ecolor='green')
             ax2.grid(True)
             ax2.set_title('1998 - 2002', multialignment='center')
 
-            ax3.errorbar(Lat, resvmrLC[13], yerr=resvmrLC[14], fmt='o', color='red', ecolor='red')
-            ax3.errorbar(Lat, resvmrLC2[13], yerr=resvmrLC2[14], fmt='o', color='blue', ecolor='blue')
-            ax3.errorbar(Lat, resvmrSC[13], yerr=resvmrSC[14], fmt='o', color='green', ecolor='green')
+            ax3.errorbar(Lat2, resvmrLC[13], yerr=resvmrLC[14], fmt='o', color='red', ecolor='red')
+            ax3.errorbar(Lat2, resvmrLC2[13], yerr=resvmrLC2[14], fmt='o', color='blue', ecolor='blue')
+            ax3.errorbar(Lat2, resvmrSC[13], yerr=resvmrSC[14], fmt='o', color='green', ecolor='green')
             ax3.grid(True)
             ax3.set_title('2002 - 2008', multialignment='center')
 
-            ax4.errorbar(Lat, resvmrLC[15], yerr=resvmrLC[16], fmt='o', color='red', ecolor='red')
-            ax4.errorbar(Lat, resvmrLC2[15], yerr=resvmrLC2[16], fmt='o', color='blue', ecolor='blue')
-            ax4.errorbar(Lat, resvmrSC[15], yerr=resvmrSC[16], fmt='o', color='green', ecolor='green')
+            ax4.errorbar(Lat2, resvmrLC[15], yerr=resvmrLC[16], fmt='o', color='red', ecolor='red')
+            ax4.errorbar(Lat2, resvmrLC2[15], yerr=resvmrLC2[16], fmt='o', color='blue', ecolor='blue')
+            ax4.errorbar(Lat2, resvmrSC[15], yerr=resvmrSC[16], fmt='o', color='green', ecolor='green')
             ax4.grid(True)
             ax4.set_title('2008 - 2016', multialignment='center')
             ax4.set_xlabel('Latitude')
@@ -1864,7 +1950,7 @@ def main():
             #Hemispheric Columns
             #---------------------------------------------------
             print '\nPlot: Hemispheric Differences:\n'
-            Lat = np.asarray(Lat)
+            Lat2 = np.asarray(Lat2)
             
             LatBin = range(-90, 100, 10)
             LatMid = [(i+i+10)*0.5 for i in LatBin[:-1]]
@@ -1878,7 +1964,7 @@ def main():
             vmrSCBin_e = []
 
             for i in range(len(LatMid)):
-                inds = np.where( (Lat >= LatBin[i]) & (Lat < LatBin[i+1]))[0]
+                inds = np.where( (Lat2 >= LatBin[i]) & (Lat2 < LatBin[i+1]))[0]
 
                 if len(inds) > 1:
                     vmrLCBin.append(np.mean(resvmrLC[9][inds]))
@@ -1939,26 +2025,26 @@ def main():
             #----------------------------------------
             #Amplitude (Bar plot)
             #----------------------------------------
-            fig, ax = plt.subplots()
-            ax.barh(ind-0.27, resvmrTC[8], 0.27, align='center', color = 'r', ecolor = 'k', label = 'Total Column')
-            ax.barh(ind, resvmrLC[8], 0.27, align='center', color = 'b', ecolor = 'k', label = 'Tropospheric Column')
-            ax.barh(ind+0.27, resvmrSC[8],0.27, align='center', color = 'g', ecolor = 'k', label = 'Stratospheric Column')  #yerr=slope_TC*0
+            # fig, ax = plt.subplots()
+            # ax.barh(ind-0.27, resvmrTC[8], 0.27, align='center', color = 'r', ecolor = 'k', label = 'Total Column')
+            # ax.barh(ind, resvmrLC[8], 0.27, align='center', color = 'b', ecolor = 'k', label = 'Tropospheric Column')
+            # ax.barh(ind+0.27, resvmrSC[8],0.27, align='center', color = 'g', ecolor = 'k', label = 'Stratospheric Column')  #yerr=slope_TC*0
             
-            ax.xaxis.grid(True, alpha=0.5)
-            ax.set_xlabel('Amplitude - Weighted VMR ['+sclfctName+']')
-            ax.set_yticks(ind)
-            ax.set_yticklabels(pltID, rotation=0)
-            ax.set_title('Amplitude', multialignment='center')
-            #ax.set_xlabel('Site')
-            ax.axvline(0, color='black', lw=1)
-            ax.legend(prop={'size':10}, loc = 4)
-            #ax.set_xlim(0, 2.5)
+            # ax.xaxis.grid(True, alpha=0.5)
+            # ax.set_xlabel('Amplitude - Weighted VMR ['+sclfctName+']')
+            # ax.set_yticks(ind)
+            # ax.set_yticklabels(pltID, rotation=0)
+            # ax.set_title('Amplitude', multialignment='center')
+            # #ax.set_xlabel('Site')
+            # ax.axvline(0, color='black', lw=1)
+            # ax.legend(prop={'size':10}, loc = 4)
+            # #ax.set_xlim(0, 2.5)
 
-            plt.gca().invert_yaxis()
-            fig.subplots_adjust(left=0.2)
+            # plt.gca().invert_yaxis()
+            # fig.subplots_adjust(left=0.2)
 
-            if saveFlg: pdfsav.savefig(fig,dpi=200)
-            else:       plt.show(block=False)
+            # if saveFlg: pdfsav.savefig(fig,dpi=200)
+            # else:       plt.show(block=False)
 
             #user_input = raw_input('Press any key to exit >>> ')
             #sys.exit()
@@ -1967,53 +2053,55 @@ def main():
     #----------------------------------------
     #Annual Rate of Change of TH (Bar plot)
     #----------------------------------------
-    fig, ax = plt.subplots()
+    # fig, ax = plt.subplots()
 
-    ax.barh(ind, resTH[0], 0.27, xerr=resTH[1], align='center', color = 'r', ecolor = 'k')
+    # ax.barh(ind, resTH[0], 0.27, xerr=resTH[1], align='center', color = 'r', ecolor = 'k')
    
-    ax.xaxis.grid(True, alpha=0.5)
-    ax.set_xlabel('Annual rate of change (%)')
-    ax.set_yticks(ind)
-    ax.set_yticklabels(pltID, rotation=0)
-    ax.set_title('Annual Rate of change (Tropospheric Height)', multialignment='center')
-    #ax.set_xlabel('Site')
-    ax.axvline(0, color='black', lw=1)
+    # ax.xaxis.grid(True, alpha=0.5)
+    # ax.set_xlabel('Annual rate of change (%)')
+    # ax.set_yticks(ind)
+    # ax.set_yticklabels(pltID, rotation=0)
+    # ax.set_title('Annual Rate of change (Tropospheric Height)', multialignment='center')
+    # #ax.set_xlabel('Site')
+    # ax.axvline(0, color='black', lw=1)
 
-    plt.gca().invert_yaxis()
+    # plt.gca().invert_yaxis()
 
-    fig.subplots_adjust(left=0.2)
+    # fig.subplots_adjust(left=0.2)
 
-    if saveFlg: pdfsav.savefig(fig,dpi=200)
-    else:       plt.show(block=False)
+    # if saveFlg: pdfsav.savefig(fig,dpi=200)
+    # else:       plt.show(block=False)
 
         
-    #----------------------------------------
-    #Amplitude TH (Bar plot)
-    #----------------------------------------
-    fig, ax = plt.subplots()
+    # #----------------------------------------
+    # #Amplitude TH (Bar plot)
+    # #----------------------------------------
+    # fig, ax = plt.subplots()
 
-    ax.barh(ind, resTH[8], 0.27, align='center', color = 'r', ecolor = 'k')
+    # ax.barh(ind, resTH[8], 0.27, align='center', color = 'r', ecolor = 'k')
     
-    ax.xaxis.grid(True, alpha=0.5)
-    ax.set_xlabel('Amplitude [km]')
-    ax.set_yticks(ind)
-    ax.set_yticklabels(pltID, rotation=0)
-    ax.set_title('Amplitude (Tropospheric Height)', multialignment='center')
-    #ax.set_xlabel('Site')
-    ax.axvline(0, color='black', lw=1)
+    # ax.xaxis.grid(True, alpha=0.5)
+    # ax.set_xlabel('Amplitude [km]')
+    # ax.set_yticks(ind)
+    # ax.set_yticklabels(pltID, rotation=0)
+    # ax.set_title('Amplitude (Tropospheric Height)', multialignment='center')
+    # #ax.set_xlabel('Site')
+    # ax.axvline(0, color='black', lw=1)
 
-    plt.gca().invert_yaxis()
-    fig.subplots_adjust(left=0.2)
+    # plt.gca().invert_yaxis()
+    # fig.subplots_adjust(left=0.2)
 
-    if saveFlg: pdfsav.savefig(fig,dpi=200)
-    else:       plt.show(block=False)
+    # if saveFlg: pdfsav.savefig(fig,dpi=200)
+    # else:       plt.show(block=False)
 
     #---------------------------------------------------
     # Averaging Kernel Smoothing Function (row of avk)
     #---------------------------------------------------
+    npanels2  = int(math.ceil(npanels/4.0))
+
     fig = plt.figure(figsize=(15,15))
 
-    outer_grid = gridspec.GridSpec(npanels2, 3, wspace=0.17, hspace=0.135)
+    outer_grid = gridspec.GridSpec(npanels2, 4, wspace=0.17, hspace=0.135)
 
     for i, idhdf in enumerate(pltID):
 
@@ -2108,7 +2196,14 @@ def main():
 
         
         axc.plot(dofs_cs,alt[idhdf],color='k',label='Cumulative Sum of DOFS (starting at surface)')
-        xval = range(0,int(np.ceil(max(dofs_cs)))+3)
+        
+
+        try:
+            xval = range(0,int(np.ceil(max(dofs_cs)))+3)
+
+        except Exception as errmsg:
+            print '\nError: ', errmsg
+            xval = range(0, 2)
 
         ind1         = mf.nearestind(Pcol[0], alt[idhdf])
         ind2         = mf.nearestind(Pcol[1], alt[idhdf])
@@ -2265,7 +2360,6 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
 
     for i, idhdf in enumerate(pltID):
 
-        
         #----------------------------
         if AvgType == 'Daily':
             Avg          = mf.dailyAvg(yData[idhdf],xDates[idhdf], dateAxis=1, meanAxis=0)
@@ -2382,7 +2476,7 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
             #---------------------------------------------------
             #POLY FIT FOR STATIONS WITH LONG TIME SERIES
             #---------------------------------------------------
-            if (idhdf != 'Eureka') & (idhdf != 'St Petersburg') & (idhdf != 'Boulder') & (idhdf != 'Maido') &  (idhdf != 'St Denis') & (idhdf != 'Paris'):
+            if (idhdf != 'Eureka') & (idhdf != 'St Petersburg') & (idhdf != 'Boulder') & (idhdf != 'Maido') &  (idhdf != 'StD-Maido') & (idhdf != 'Bremen') & (idhdf != 'Paris') & (idhdf != 'Altzomoni'):
 
                 res          = mf.fit_driftfourier_poly(dateYearFrac, Anomaly, weights, 2, half_period=1.0)
                 f_drift, f_fourier, f_driftfourier,  res_std, A,  df_drift = res[3:9]
@@ -2468,7 +2562,7 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
 
             #---------------------------------------------------
 
-            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'St Denis') or (idhdf == 'Paris'):
+            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'StD-Maido') or (idhdf == 'Bremen') or  (idhdf == 'Paris') or (idhdf == 'Altzomoni'):
 
                 slope_p1.append(float('nan'))
                 slope_p1_e.append(float('nan'))
@@ -2525,7 +2619,7 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
                     avgD_p3.append(np.mean(AvgData[indx1]))
                     stdD_p3.append(np.std(AvgData[indx1]))
 
-            elif (idhdf == 'Thule') or (idhdf == 'Lauder') or (idhdf == 'Toronto') or (idhdf == 'Kiruna') or (idhdf == 'Izana') or (idhdf == 'Bremen') or (idhdf == 'Paramaribo'):
+            elif (idhdf == 'Thule') or (idhdf == 'Lauder') or (idhdf == 'Toronto') or (idhdf == 'Kiruna') or (idhdf == 'Izana')  or (idhdf == 'Paramaribo') or (idhdf == 'Ny Alesund'):
 
                 yoi  = [[2001, 2008], [2008, 2016]]
 
@@ -2570,7 +2664,7 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
               
                     #ax.plot(dailyVals['dates'][indx1],f_drift(dateYearFrac[indx1]),label='Fitted Anual Trend', linewidth=2.0)
 
-            elif (idhdf == 'Jungfraujoch') or (idhdf == 'Rikubetsu') or (idhdf == 'Mauna Loa') or (idhdf == 'Wollongong') or (idhdf == 'AHTS') or (idhdf == 'Zugspitze') or (idhdf == 'Ny Alesund'):
+            elif (idhdf == 'Jungfraujoch') or (idhdf == 'Rikubetsu') or (idhdf == 'Mauna Loa') or (idhdf == 'Wollongong') or (idhdf == 'AHTS') or (idhdf == 'Zugspitze')  :
 
                 yoi  = [[1995, 2002], [2002, 2008], [2008, 2016]]
             
@@ -2640,6 +2734,8 @@ def AnalTSAnom(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', p
             #
             #---------------------------------------------------
             ax2.set_xlim(xmin, xmax)
+            ax2.set_ylim(-7, 7)
+            ax2.axhline(y=0, linestyle='--', color='k')
             ax2.grid(True, color='gray', alpha=0.5)
             ax2.tick_params(which='both',labelsize=10)
             ax2.annotate(pltID[i] + ' ({0:.2f}$^\circ$)'.format(float(Lat[i])), xy=(0.025, 0.8), xycoords='axes fraction', fontsize=16, ha='left')
@@ -2840,7 +2936,7 @@ def AnalTS(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', pltFi
             yyyy = np.asarray(yyyy)
             
             #---------------------------------------------------
-            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'St Denis') or (idhdf == 'Paris'):
+            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'StD-Maido') or (idhdf == 'Bremen') or (idhdf == 'Paris') or (idhdf == 'Altzomoni'):
 
                 res          = mf.fit_driftfourier(dateYearFrac, AvgData, weights, 2, half_period=1.0)
                 f_drift, f_fourier, f_driftfourier,  res_std, A= res[3:8]
@@ -2932,13 +3028,9 @@ def AnalTS(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', pltFi
             if pltFig:
                 ax.plot(dates2,f_fourier(dateYearFrac2),label='Fitted Anual Trend', linewidth=2.0)
                 ax.plot(dates2,f_driftfourier(dateYearFrac2),label='Fitted Anual Trend + intra-annual variability',linewidth=2.0)
-
-            indsmin = np.where(f_drift(dateYearFrac2) == np.min(f_drift(dateYearFrac2)))[0]
-            indsmax = np.where(f_drift(dateYearFrac2) == np.max(f_drift(dateYearFrac2)))[0]
-
             #---------------------------------------------------
 
-            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'St Denis') or (idhdf == 'Paris'):
+            if (idhdf == 'Eureka') or (idhdf == 'St Petersburg') or (idhdf == 'Boulder') or (idhdf == 'Maido') or (idhdf == 'StD-Maido') or (idhdf == 'Bremen') or (idhdf == 'Paris') or (idhdf == 'Altzomoni'):
                 df_drift     = res[1]
                 roc          = df_drift
 
@@ -2999,7 +3091,7 @@ def AnalTS(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', pltFi
                     avgD_p3.append(np.mean(AvgData[indx1]))
                     stdD_p3.append(np.std(AvgData[indx1]))
 
-            elif (idhdf == 'Thule') or (idhdf == 'Lauder') or (idhdf == 'Toronto') or (idhdf == 'Kiruna') or (idhdf == 'Izana') or (idhdf == 'Bremen') or (idhdf == 'Paramaribo'):
+            elif (idhdf == 'Thule') or (idhdf == 'Lauder') or (idhdf == 'Toronto') or (idhdf == 'Kiruna') or (idhdf == 'Izana') or (idhdf == 'Paramaribo') or (idhdf == 'Ny Alesund'):
 
                 yoi  = [[2001, 2008], [2008, 2016]]
 
@@ -3049,7 +3141,7 @@ def AnalTS(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', pltFi
               
                     #ax.plot(dailyVals['dates'][indx1],f_drift(dateYearFrac[indx1]),label='Fitted Anual Trend', linewidth=2.0)
 
-            elif (idhdf == 'Jungfraujoch') or (idhdf == 'Rikubetsu') or (idhdf == 'Mauna Loa') or (idhdf == 'Wollongong') or (idhdf == 'AHTS') or (idhdf == 'Zugspitze') or (idhdf == 'Ny Alesund'):
+            elif (idhdf == 'Jungfraujoch') or (idhdf == 'Rikubetsu') or (idhdf == 'Mauna Loa') or (idhdf == 'Wollongong') or (idhdf == 'AHTS') or (idhdf == 'Zugspitze'):
 
                 yoi  = [[1995, 2002], [2002, 2008], [2008, 2016]]
             
@@ -3166,7 +3258,6 @@ def AnalTS(npanels, xDates, yData, pltID, Lat, fits=True, AvgType='Daily', pltFi
         if saveFlg: pdfsav.savefig(fig,dpi=200)
         else: 
             plt.show(block=False)
-
 
 
     return (slope, slope_e, slope_p1, slope_p1_e, slope_p2, slope_p2_e, slope_p3, slope_p3_e, amp,

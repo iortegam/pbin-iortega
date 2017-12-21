@@ -12,7 +12,7 @@ if loc.lower() == 'mlo':
     gasName    = 'h2o'                                  
     ver        = 'Current_ERA'          
     ctlF       = 'sfit4.ctl'
-    doi        = ['20120706', '20120831', '20130116', '20130410', '20130626', '20131031', '20140212', '20141020', '20150326', '20151026']
+    doi        = ['20120706', '20120831', '20130116', '20130410', '20130626', '20131031', '20140212', '20141020', '20150326', '20151026']    
    
 elif loc.lower() == 'fl0':
 
@@ -25,7 +25,10 @@ else:
     print 'You need to input a location!'
     exit()
 
-smthFlg    = False                #Smooth sonde profiles using AK
+#------
+#Smooth sonde profiles using AK
+#------
+smthFlg    = False                
 
 #------
 # Flags
@@ -46,9 +49,22 @@ mnthFlg    = False                  # Flag to filter based on
 
 mnths      = [6,7,8]                # Months to filter on (these are the months to include data)
 
+
 if loc.lower() == 'mlo': 
     maxRMS     = 1.2                      # Max Fit RMS to filter data. Data is filtered according to <= maxrms
     minDOF     = 1.5                   # Min DOFs for filtering
+
+    latFTS     = 19.54
+    lonFTS     = -155.57
+    altCG      = 3.8  + 3.4                    #Altitude of center of gravity based on H2O sonde profiles
+
+    #diffT      = [3, 10, 15, 30, 60, 90, 120, 180, 240]
+    diffT      = [60, 90, 120, 150, 180, 240]
+    dfValue    = 60
+
+    pCols = [ [3.0, 5.5], [5.5, 7.5], [7.5, 10.0], [10.0, 13.0], [13.0, 16], [16, 20], [20.0, 24]]
+
+    fleoutFlg  = False
 
 elif loc.lower() == 'fl0':
 
@@ -56,6 +72,16 @@ elif loc.lower() == 'fl0':
     minDOF     = 1.7
     latFTS     = 40.04
     lonFTS     = -105.24
+    altCG      = 3.8                     #Altitude of center of gravity based on H2O sonde profiles
+
+    #diffT      = [3, 10, 15, 30, 60, 90, 120, 180, 240]  #Array with Time [minutes] to calculate correlations
+    diffT      = [30, 60, 90, 120, 150, 180, 240]
+    dfValue    = 30                        #Time [minutes] used to calculate final results
+
+    #pCols = [ [1.5, 3.5], [3.5, 5.5], [5.5, 8.], [8., 10.5], [10.5,13.5], [13.5,17], [17,21] ]
+    pCols = [ [1.5, 3.0], [3.0, 5.0], [5.0, 7.5], [7.5, 10.0], [10.0,13.0], [13.0,17.0], [17.0,21.0] ]
+
+    fleoutFlg  = True
 
 else:
     print 'You need to input the maxRMS and minDOF!'
@@ -79,20 +105,9 @@ fyear      = 2016
 fmnth      = 12
 fday       = 31
 
-#----------------------------
-# Partial Columns Bounds [km] 
-# [lower bound, upper bound]
-# To turn off set to False
-#----------------------------
-#if loc.lower() == 'mlo': pCols = [[3.8, 7.0], [7.0, 10.0], [10.0, 13.0], [13.0, 16.0]]
-#if loc.lower() == 'fl0': pCols = [[1.0, 4.0], [4.0, 8.0], [8.0, 12.0], [12.0, 16.0]]
-
-if loc.lower() == 'mlo': pCols = [ [3.0, 5.5], [5.5, 8], [8, 10.5], [10.5, 13.5], [13.5, 17], [17, 21]]
-if loc.lower() == 'fl0': pCols = [ [1.5, 3], [3, 5], [5, 7.5], [7.5, 10], [10,13], [13,16], [16,20] ]
-
-
+#----------------------
 # Directories
-#------------ -
+#----------------------
 retDir = '/data1/ebaumer/'+loc.lower()+'/'+gasName.lower()+'/'+ver+'/'
 ctlFile  = '/data1/ebaumer/'+loc.lower()+'/'+gasName.lower()+'/'+'x.'+gasName.lower()+'/'+ctlF
 

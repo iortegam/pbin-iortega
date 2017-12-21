@@ -208,6 +208,8 @@ def main():
     
     #pltFile       = '/data1/Campaign/HIPPO/'+gas.upper()+'_HIPPO_Plts.pdf'
 
+    printTXT       = False
+
     outtxtpath    = '/data/iortega/pbin/HIPPO_ACE/'
 
 
@@ -400,25 +402,27 @@ def main():
                 PrfTAB = np.flipud(PrfTAB)/1e12
                 PrfTAB[PrfTAB==0.0] = 1.472e-14
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_TAB.refprfs'
+                if printTXT:
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(PrfTAB, 5):
-                        strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
-                        fopen.write(strformat.format(*row))
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_TAB.refprfs'
 
-                zTAB_Mid = np.flipud(Data.midpointTAB)
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(PrfTAB, 5):
+                            strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
+                            fopen.write(strformat.format(*row))
 
-                SaTAB     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zTAB_Mid)
-                SaTAB = np.flipud(SaTAB)
-                #SaTAB[SaTAB==0.0] = 1.472e-14
+                    zTAB_Mid = np.flipud(Data.midpointTAB)
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_TAB.Saprfs'
+                    SaTAB     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zTAB_Mid)
+                    SaTAB = np.flipud(SaTAB)
+                    #SaTAB[SaTAB==0.0] = 1.472e-14
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(SaTAB, 10):
-                        strformat = ' '.join('{:>8.4f}' for rrr in row) +  '\n'
-                        fopen.write(strformat.format(*row))
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_TAB.Saprfs'
+
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(SaTAB, 10):
+                            strformat = ' '.join('{:>8.4f}' for rrr in row) +  '\n'
+                            fopen.write(strformat.format(*row))
 
             elif bi == '20S-20N':
 
@@ -428,25 +432,26 @@ def main():
                 PrfMLO = np.flipud(PrfMLO)/1e12
                 PrfMLO[PrfMLO==0.0] = 1.472e-14
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_MLO.refprfs'
+                if printTXT:
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_MLO.refprfs'
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(PrfMLO, 5):
-                        strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
-                        fopen.write(strformat.format(*row))
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(PrfMLO, 5):
+                            strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
+                            fopen.write(strformat.format(*row))
 
-                zMLO_Mid = np.flipud(Data.midpointMLO)
+                    zMLO_Mid = np.flipud(Data.midpointMLO)
 
-                SaMLO     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zMLO_Mid)
-                SaMLO = np.flipud(SaMLO)
-                #SaMLO[SaMLO==0.0] = 1.472e-14
+                    SaMLO     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zMLO_Mid)
+                    SaMLO = np.flipud(SaMLO)
+                    #SaMLO[SaMLO==0.0] = 1.472e-14
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_MLO.Saprfs'
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_MLO.Saprfs'
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(SaMLO, 10):
-                        strformat = ' '.join('{:<8.4f}' for rrr in row) +  '\n'
-                        fopen.write(strformat.format(*row))
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(SaMLO, 10):
+                            strformat = ' '.join('{:<8.4f}' for rrr in row) +  '\n'
+                            fopen.write(strformat.format(*row))
 
             elif bi == '20-50N':
 
@@ -456,25 +461,26 @@ def main():
                 PrfFL0 = np.flipud(PrfFL0)/1e12
                 PrfFL0[PrfFL0==0.0] = 1.472e-14
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_FL0.refprfs'
+                if printTXT:
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_FL0.refprfs'
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(PrfFL0, 5):
-                        strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
-                        fopen.write(strformat.format(*row))
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(PrfFL0, 5):
+                            strformat = ','.join('{:>12.3E}' for rrr in row) + ', \n'
+                            fopen.write(strformat.format(*row))
 
-                zFL0_Mid = np.flipud(Data.midpointFL0)
+                    zFL0_Mid = np.flipud(Data.midpointFL0)
 
-                SaFL0     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zFL0_Mid)
-                SaFL0 = np.flipud(SaFL0)
-                #SaMLO[SaMLO==0.0] = 1.472e-14
+                    SaFL0     = interpolate.interp1d(layers_all, Fraction_UP, fill_value='extrapolate', bounds_error=False, kind='linear')(zFL0_Mid)
+                    SaFL0 = np.flipud(SaFL0)
+                    #SaMLO[SaMLO==0.0] = 1.472e-14
 
-                outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_FL0.Saprfs'
+                    outtxtFile = outtxtpath + 'OCS_Prf_'+bi+'_FL0.Saprfs'
 
-                with open(outtxtFile,'w') as fopen:
-                    for row in segmnt(SaFL0, 10):
-                        strformat = ' '.join('{:<8.4f}' for rrr in row) +  '\n'
-                        fopen.write(strformat.format(*row))
+                    with open(outtxtFile,'w') as fopen:
+                        for row in segmnt(SaFL0, 10):
+                            strformat = ' '.join('{:<8.4f}' for rrr in row) +  '\n'
+                            fopen.write(strformat.format(*row))
 
 
 
@@ -602,6 +608,7 @@ def main():
            pdfsav.savefig(fig,dpi=200)
            pdfsav.savefig(fig2,dpi=200)
            pdfsav.savefig(fig3,dpi=200)
+           
         
         else:           
             plt.show(block=False)
@@ -626,22 +633,23 @@ def main():
         
         #DataAll = [zip(*(AltFinal,PrfFinal[i],SaFinal[i])) for bi in BinID]
 
-        outtxtFile = outtxtpath + 'OCS_HIPPO_ACE.prfs'
+        if printTXT:
+            outtxtFile = outtxtpath + 'OCS_HIPPO_ACE.prfs'
 
-        with open(outtxtFile,'w') as fopen:
-            fopen.write('#Hannigan, J.W., Ortega, I\n')
-            fopen.write('#National Center for Atmospheric Research\n')
-            fopen.write('#CONTACT_INFO:   Hannigan, Jim, jamesw@ucar.edu, 303-497-1853, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
-            fopen.write('#CONTACT_INFO:   Ortega, Ivan, iortega@ucar.edu, 303-497-1861, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
-            fopen.write('#DESCRIPTION:    OCS vertical profiles [mixing ratios] and Sa [unitless] binned by latitudes derived from in-situ HIPPO observation (troposphere) and ACE-FTS (stratosphere)\n')
-            fopen.write('#COMMENTS:       Latitude bins: 90-50S, 50-20S, 20S-20N, 20-50N, 50-90N\n')
-            #fopen.write('#For details see ***.docx\n')
-            #fopen.write('{0:>20s}{1:>30s}{2:>30s}{3:>30s}{4:>30s}\n'.format('Altitude [km]', 'Latitude - '+ BinFinal[BinID[0]],'Latitude - '+BinFinal[BinID[1]], 'Latitude - '+BinFinal[BinID[2]], 'Latitude - '+BinFinal[BinID[3]], 'Latitude - '+BinFinal[BinID[4]]))
-            fopen.write('{0:<20s}{1:<20s}{2:<20s}{3:<20s}{4:<20s}{5:<20s}{6:<20s}{7:<20s}{8:<20s}{9:<20s}{10:<20s}\n'.format('Altitude [km]','Profile-'+BinFinal[BinID[0]],'Sa-'+BinFinal[BinID[0]],'Profile-'+BinFinal[BinID[1]],'Sa-'+BinFinal[BinID[1]],'Profile-'+BinFinal[BinID[2]],'Sa-'+BinFinal[BinID[2]],'Profile-'+BinFinal[BinID[3]],'Sa-'+BinFinal[BinID[3]],'Profile-'+BinFinal[BinID[4]],'Sa-'+BinFinal[BinID[4]]))
+            with open(outtxtFile,'w') as fopen:
+                fopen.write('#Hannigan, J.W., Ortega, I\n')
+                fopen.write('#National Center for Atmospheric Research\n')
+                fopen.write('#CONTACT_INFO:   Hannigan, Jim, jamesw@ucar.edu, 303-497-1853, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
+                fopen.write('#CONTACT_INFO:   Ortega, Ivan, iortega@ucar.edu, 303-497-1861, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
+                fopen.write('#DESCRIPTION:    OCS vertical profiles [mixing ratios] and Sa [unitless] binned by latitudes derived from in-situ HIPPO observation (troposphere) and ACE-FTS (stratosphere)\n')
+                fopen.write('#COMMENTS:       Latitude bins: 90-50S, 50-20S, 20S-20N, 20-50N, 50-90N\n')
+                #fopen.write('#For details see ***.docx\n')
+                #fopen.write('{0:>20s}{1:>30s}{2:>30s}{3:>30s}{4:>30s}\n'.format('Altitude [km]', 'Latitude - '+ BinFinal[BinID[0]],'Latitude - '+BinFinal[BinID[1]], 'Latitude - '+BinFinal[BinID[2]], 'Latitude - '+BinFinal[BinID[3]], 'Latitude - '+BinFinal[BinID[4]]))
+                fopen.write('{0:<20s}{1:<20s}{2:<20s}{3:<20s}{4:<20s}{5:<20s}{6:<20s}{7:<20s}{8:<20s}{9:<20s}{10:<20s}\n'.format('Altitude [km]','Profile-'+BinFinal[BinID[0]],'Sa-'+BinFinal[BinID[0]],'Profile-'+BinFinal[BinID[1]],'Sa-'+BinFinal[BinID[1]],'Profile-'+BinFinal[BinID[2]],'Sa-'+BinFinal[BinID[2]],'Profile-'+BinFinal[BinID[3]],'Sa-'+BinFinal[BinID[3]],'Profile-'+BinFinal[BinID[4]],'Sa-'+BinFinal[BinID[4]]))
 
-            for row in DataAll  :
-                strformat = ''.join('{:<20.4E}' for i in row) + '\n'
-                fopen.write(strformat.format(*row))
+                for row in DataAll  :
+                    strformat = ''.join('{:<20.4E}' for i in row) + '\n'
+                    fopen.write(strformat.format(*row))
 
 
     if DownFlg: donwloadACE(dataDirACE, iyearACE, fyearACE)

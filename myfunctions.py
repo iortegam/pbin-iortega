@@ -48,6 +48,8 @@ import numpy as np
 
 from math import acos, asin, atan2, hypot
 from math import degrees, pi as PI, tan
+from collections import deque,Counter
+from itertools import islice
 
 
 
@@ -226,7 +228,7 @@ def rmse(xData, yData):
     #---------------------------------
     # Find the residual sum of squares 
     #---------------------------------
-    SS_res = sum( (yData - xData)**2 )
+    SS_res = np.nansum( (yData - xData)**2 )
 
     #------------------------------
     # Root Mean Square Error (RMSE)
@@ -273,6 +275,19 @@ def toYearFraction(dates):
         retrnDates[i] = sngDate.year + fraction
 
     return retrnDates
+
+def t2dt(atime):
+    """
+    Convert atime (a float) to dt.datetime
+    This is the inverse of dt2t.
+    assert dt2t(t2dt(atime)) == atime
+    """
+    year = int(atime)
+    remainder = atime - year
+    boy = dt.datetime(year, 1, 1)
+    eoy = dt.datetime(year + 1, 1, 1)
+    seconds = remainder * (eoy - boy).total_seconds()
+    return boy + dt.timedelta(seconds=seconds)
 
 
 def dailyAvg(data, dates, dateAxis=1, meanAxis=0, quad=0):
@@ -659,11 +674,13 @@ def fit_driftfourier_poly(x, data, weights, degree, half_period=0.5):
     xnorm = x - xmin
     
     # coefficient matrix
-    A = np.ones((x.size, 2 * degree + 4))
+    A = np.ones((x.size, 2 * degree + 6))
     A[:, 1] = xnorm
     A[:, 2] = xnorm**2
     A[:, 3] = xnorm**3
-    A[:, 4:] = fourier_basis(xnorm, degree, half_period)[:, 1:]
+    A[:, 4] = xnorm**4
+    A[:, 5] = xnorm**5
+    A[:, 6:] = fourier_basis(xnorm, degree, half_period)[:, 1:]
     
     # linear weighted least squares
     results = np.linalg.lstsq(A * weights[:, np.newaxis],
@@ -675,15 +692,19 @@ def fit_driftfourier_poly(x, data, weights, degree, half_period=0.5):
     slope     = params[1]
     poly      = params[2]
     poly2     = params[3]
-    pfourier  = params[4:]
+    poly3     = params[4]
+    poly4     = params[5]
+    pfourier  = params[6:]
 
     
     #f_drift   = lambda t: slope * (t - xmin) + poly * (t - xmin)**2 + poly2 * (t - xmin)**3 + intercept
+    #f_drift   = lambda t: (slope *t - slope*xmin) +  (poly*( t**2 - 2.*t*xmin + xmin**2)) +  (poly2*( t**3 - 3.*t**2*xmin + 3.*t*xmin**2 - xmin**3))  + intercept #+(poly3*( t**4 - 4.*t**3*xmin + 6.*t**2xmin**2 - 4*t*xmin**3 + xmin**4)) +(poly4*( t**5 - 5.*t**4*xmin + 10.*t**3*xmin**2 - 10*t**2*xmin**3 + 5*t*xmin**4 + xmin**5)) 
 
-    f_drift   = lambda t: (slope *t - slope*xmin) +  (poly*( t**2 - 2.*t*xmin + xmin**2)) +  (poly2*( t**3 - 3.*t**2*xmin + 3.*t*xmin**2 - xmin**3))  + intercept
-
-    #df_drift  = lambda t: slope + (poly*(2.*t.max() - 2.*t.min())) + (poly2*(3.*t.max()**2 - 6.*t.max()*t.min() + 3.*t.min()**2))
-    df_drift  = lambda t: slope + (poly*(2.*t - 2.*xmin)) + (poly2*(3.*t**2 - 6.*t*xmin + 3.*xmin**2))
+    f_drift   = lambda t: slope * (t - xmin) + poly * (t - xmin)**2 + poly2 * (t - xmin)**3 + poly3 * (t - xmin)**4 +  poly4 * (t - xmin)**5 + intercept 
+    
+    ####df_drift  = lambda t: slope + (poly*(2.*t.max() - 2.*t.min())) + (poly2*(3.*t.max()**2 - 6.*t.max()*t.min() + 3.*t.min()**2))
+    #df_drift  = lambda t: slope + (poly*(2.*t - 2.*xmin)) + (poly2*(3.*t**2 - 6.*t*xmin + 3.*xmin**2))
+    df_drift  = lambda t: slope + (poly*(2.*t - 2.*xmin)) + (poly2*(3.*t**2 - 6.*t*xmin + 3.*xmin**2)) + (poly3*(4.*t**3 - 12.*t**2*xmin + 12.*t*xmin**2 - 4*xmin**3)) + (poly4*(5.*t**4 - 20.*t**3*xmin + 30.*t**2*xmin**2 - 20*t*xmin**3 +5*xmin**4))
 
     f_fourier = lambda t: np.sum(fourier_basis(t - xmin, degree,
                                                half_period)[:, 1:]
@@ -1109,6 +1130,8 @@ def read_ICARTT(path):
     
     return keys, cols, dateutc, indextoname
 
+
+
 def ncdump(nc_fid, verb=True):
     '''
     ncdump outputs dimensions, variables and their attribute information.
@@ -1408,6 +1431,71 @@ def orthoregress(x, y,  xerr=False, yerr=False, InError=False):
 def f(p, x):
     """Basic linear regression 'model' for use with ODR"""
     return (p[0] * x) + p[1]
+
+
+def running_mean(x, N):
+     cumsum = np.cumsum(np.insert(x, 0, 0)) 
+     return (cumsum[N:] - cumsum[:-N]) / N
+
+
+def smooth(x,window_len=11,window='hanning'):
+    """smooth the data using a window with requested size.
+    
+    This method is based on the convolution of a scaled window with the signal.
+    The signal is prepared by introducing reflected copies of the signal 
+    (with the window size) in both ends so that transient parts are minimized
+    in the begining and end part of the output signal.
+    
+    input:
+        x: the input signal 
+        window_len: the dimension of the smoothing window; should be an odd integer
+        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+            flat window will produce a moving average smoothing.
+
+    output:
+        the smoothed signal
+        
+    example:
+
+    t=linspace(-2,2,0.1)
+    x=sin(t)+randn(len(t))*0.1
+    y=smooth(x)
+    
+    see also: 
+    
+    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
+    scipy.signal.lfilter
+ 
+    TODO: the window parameter could be the window itself if an array instead of a string
+    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
+    """
+
+    if x.ndim != 1:
+        raise ValueError, "smooth only accepts 1 dimension arrays."
+
+    if x.size < window_len:
+        raise ValueError, "Input vector needs to be bigger than window size."
+
+
+    if window_len<3:
+        return x
+
+
+    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+
+
+    s=np.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
+    #print(len(s))
+    if window == 'flat': #moving average
+        w=np.ones(window_len,'d')
+    else:
+        w=eval('np.'+window+'(window_len)')
+
+    y=np.convolve(w/w.sum(),s,mode='valid')
+    #return y
+    return y[(window_len/2-1):-(window_len/2)]
+
 
 
                                                 #----------------#

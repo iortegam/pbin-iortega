@@ -289,6 +289,7 @@ def main(argv):
     print Sa
     print '\n'
 
+
     if PlotSa2:
         #-----------------------------------------------
         #CONSTRUCT A NEW Sa
@@ -311,19 +312,19 @@ def main(argv):
         print Sa2
 
         #----------FOR CO
-        # inds = np.where((midpoint >= 20.) & (midpoint < 60.) )[0]
-        # print 'Sa2 calculated:'
-        # Sa2[inds]= Sa2[inds]*0.75 #- MLO
-        # print Sa2
+        # # inds = np.where((midpoint >= 20.) & (midpoint < 60.) )[0]
+        # # print 'Sa2 calculated:'
+        # # Sa2[inds]= Sa2[inds]*0.75 #- MLO
+        # # print Sa2
 
-        # inds = np.where((midpoint >= 60.))[0]
-        # print 'Sa2 calculated:'
-        # Sa2[inds]= Sa2[inds]*0.15 #- MLO
-        # print Sa2
+        #inds = np.where((midpoint >= 15.))[0]
+        #print 'Sa2 calculated:'
+        #Sa2[inds]= Sa2[inds]*0.5 #- MLO
+        #print Sa2
 
-        # #inds = np.where(midpoint >= 50.)[0]
-        # #Sa2[inds]=0.1
-        # #print Sa2
+        # # #inds = np.where(midpoint >= 50.)[0]
+        # # #Sa2[inds]=0.1
+        # # #print Sa2
         #----------
     
     if PlotApr:
@@ -340,6 +341,8 @@ def main(argv):
             prfwaccm = readRefPrf(fname=WACCMfile, parms = ['ALTITUDE','PRESSURE','TEMPERATURE', PrimaryGas.upper()])
             aprprf =  np.asarray(prfwaccm[PrimaryGas.upper()][0]) * scl 
             z = np.asarray(prfwaccm['ALTITUDE'][0])
+
+
 
     if PlotSa:
         #-----------------------------------------------
