@@ -48,6 +48,9 @@ import myfunctions as mf
 import dataOutClass as dc
 from collections                     import OrderedDict
 import PltClass as mp
+
+sys.path.append('/data/iortega/pbin/sondeFTIR')
+
 import sondeclass as rs
 
                                     #-------------------------#
@@ -94,7 +97,7 @@ def main():
     #ver        = ['Current']          
     ctlF       = ['sfit4.ctl'] 
 
-    saveFlg    = False 
+    saveFlg    = True 
     pltFile    =  '/data/iortega/results/'+loc.lower()+'/fig/'+loc.lower()+'_Results_H2O.pdf'
     FigDir     = '/data/iortega/Manuscripts/Fig/'
 
@@ -959,7 +962,7 @@ def main():
             ax1[0].plot(np.nanmean(rand_errvmr[gasVer], axis=0)/ retPrf *100.,alt[gasVer],linestyle='--', color='k',linewidth=2.0, label='Total')
             ax1[0].set_ylabel('Altitude [km]', fontsize=14)
             #ax1[0].set_xlabel('VMR [ppm]', fontsize=14)
-            ax1[0].set_xlabel('Error [%]', fontsize=14)             
+            ax1[0].set_xlabel('uncertainty [%]', fontsize=14)             
             ax1[0].grid(True,which='both')
             ax1[0].legend(prop={'size':12},loc='upper right')          
             #ax2[k,0].tick_params(axis='both',which='both',labelsize=8) 
@@ -998,7 +1001,7 @@ def main():
 
             ax1[1].plot(np.nanmean(sys_errvmr[gasVer], axis=0)/ retPrf *100., alt[gasVer],linestyle='--', color='k',linewidth=2.0, label='Total')
             #ax1[1].set_xlabel('VMR [ppm]', fontsize=14)
-            ax1[1].set_xlabel('Error [%]', fontsize=14)             
+            ax1[1].set_xlabel('uncertainty [%]', fontsize=14)             
             ax1[1].grid(True,which='both')
             ax1[1].legend(prop={'size':12}, loc='upper right')
             ax1[1].set_title('Systematic Components')
@@ -1043,9 +1046,10 @@ def main():
         ax.set_ylabel('Altitude [km]', fontsize=14)
         ax.set_xlabel('AK', fontsize=14)
         ax.grid(True, alpha=0.5)
-        ax.set_title('(a)', loc='left', fontsize=14)
+        #ax.set_title('(a)', loc='left', fontsize=14)
+        ax.text(0.025, 0.95,'(a)', fontsize=16,transform=ax.transAxes)   
 
-        cbaxes = fig.add_axes([0.4, 0.55, 0.02, 0.35]) 
+        cbaxes = fig.add_axes([0.4, 0.55, 0.02, 0.4]) 
         cbar = fig.colorbar(scalarMap, orientation='vertical', cax = cbaxes)
         cbar.set_label('Altitude [km]', fontsize=14)
         #ax.set_title('H2O Averaging Kernels Scale Factor', fontsize=14)
@@ -1077,7 +1081,8 @@ def main():
         axb.grid(True,  alpha=0.5)
         axb.set_xlabel('Total Column AK', fontsize=14)
         axb.tick_params(labelsize=14)
-        axb.set_title('(b)', loc='left', fontsize=14)
+        #axb.set_title('(b)', loc='left', fontsize=14)
+        axb.text(0.725, 0.95,'(b)', fontsize=16,transform=axb.transAxes)  
 
         major_ticks = np.arange(0, 3, 1)
         axb.set_xticks(major_ticks) 
@@ -1090,6 +1095,7 @@ def main():
         #---------------------------------
         dofs_cs = np.cumsum(np.diag(avkSCFav[gasVer])[::-1])[::-1]
         axc.plot(dofs_cs,alt[gasVer],color='k',label='Cumulative Sum of DOFS (starting at surface)')
+        #axc.plot(np.sum(avkSCFav[gasVer],axis=0), alt[gasVer],color='k')
         xval = range(0,int(np.ceil(max(dofs_cs)))+2)
 
         #ind1         = mf.nearestind(Pcol[0], alt[gasVer])
@@ -1106,8 +1112,12 @@ def main():
         
         axc.set_xlabel('Cumulative\nSum of DOFS', fontsize=14)  
         axc.tick_params(labelsize=14)
-        axc.set_title('(c)', loc='left', fontsize=14)
+        #axc.set_title('(c)', loc='left', fontsize=14)
+        axc.text(0.025, 0.95,'(c)', fontsize=16,transform=axc.transAxes)  
         #axc.set_title('DOFs for layer {0:.1f}-{1:.1f}[km] = {2:.2f}'.format(alt[idhdf][ind1],alt[idhdf][ind2],dofsPcol), fontsize=9)    
+        
+        axc.set_xticks(major_ticks)
+
         axc.set_ylim((0,120))
         axc.grid(True,which='both',  alpha=0.5)
         if loc.lower() == 'fl0': axc.set_ylim(1, 15)

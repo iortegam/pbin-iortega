@@ -101,7 +101,7 @@ def main():
     maxRMS            = [0.5, 0.5]                      
     minDOF            = [1.0, 1.0]
 
-    saveFlg           = True 
+    saveFlg           = False 
 
     insFlg            = False   # Read In-situ?
 
@@ -137,7 +137,7 @@ def main():
     sclfctName         = 'ppmv'                 # Name of scale factor for labeling plots
 
     #pCols = [ [3.0, 5.5] , [5.5, 7.5], [7.5, 10.0], [10.0, 13.0] ]
-    pCols = [ [3.0, 5.5], [5.5, 10.0] ]
+    pCols = [ [3.0, 5.5], [5.5, 10.0], [3.0, 10.0] ]
 
     if saveFlg: pdfsav = PdfPages(pltFile)
 
@@ -283,6 +283,7 @@ def main():
     for i,gas in enumerate(gasName):
         statDataCl[gas+'_'+ver[i]] = dc.ReadOutputData(retDir[i],'',ctlFile[i],iyear,imnth,iday,fyear,fmnth,fday)
 
+
     #--------------
     # Read profiles
     #--------------
@@ -332,6 +333,7 @@ def main():
     tot_sys      = OrderedDict()
     totClmn_e    = OrderedDict()
     PresPrf      = OrderedDict()
+    avkTC        = OrderedDict()
 
     sys_errvmr   =  OrderedDict()
     rand_errvmr   = OrderedDict()
@@ -348,6 +350,8 @@ def main():
 
 
     for j, gasVer in enumerate(statDataCl):
+        statDataCl[gasVer].readsummary()
+
         rPrfVMR[gasVer]  = np.asarray(statDataCl[gasVer].rprfs[statDataCl[gasVer].PrimaryGas]) * sclfct
         rPrfMol[gasVer]  = np.asarray(statDataCl[gasVer].rprfs[statDataCl[gasVer].PrimaryGas]  * np.asarray(statDataCl[gasVer].rprfs['AIRMASS']))
         dates[gasVer]    = statDataCl[gasVer].rprfs['date']
@@ -373,7 +377,7 @@ def main():
         #----------------------------------
         # Read Summary data (For filtering)
         #----------------------------------
-        statDataCl[gasVer].readsummary()
+        
         rms[gasVer]     = np.asarray(statDataCl[gasVer].summary[statDataCl[gasVer].PrimaryGas+'_FITRMS'])       
 
         statDataCl[gasVer].readPbp()
@@ -443,16 +447,16 @@ def main():
             #---------------------
             # Get averaging kernel
             #---------------------   
-            avkSCF[gasVer]  = np.delete(np.asarray(statDataCl[gasVer].error['AVK_scale_factor']),statDataCl[gasVer].inds,axis=0)
-            avkVMR[gasVer]  = np.delete(np.asarray(statDataCl[gasVer].error['AVK_vmr']),statDataCl[gasVer].inds,axis=0)   
+            avkSCF[gasVer]  = np.asarray(statDataCl[gasVer].error['AVK_scale_factor'])
+            avkVMR[gasVer]  = np.asarray(statDataCl[gasVer].error['AVK_vmr']) 
             dofs            = np.diagonal(avkSCF[gasVer],axis1=1,axis2=2)
             avkSCFav[gasVer]  = np.mean(avkSCF[gasVer],axis=0)    
             avkVMRav[gasVer]  = np.mean(avkVMR[gasVer],axis=0)                   
                 
             dofsAvg[gasVer]    = np.diag(avkSCFav[gasVer])
-            dofsAvg_cs[gasVer] = np.cumsum(np.diag(avkSCFav[gasVer])[::-1])[::-1] 
+            dofsAvg_cs[gasVer] = np.cumsum(np.diag(avkSCFav[gasVer])[::-1])[::-1]
 
-
+            
             
         else:        # Read AVK from sfit4 output (only contains scaled AVK)
             avkSCFi = []
@@ -475,14 +479,27 @@ def main():
                 np.fill_diagonal(IaprioriInv, 1.0 / (statDataCl[gasVer].aprfs[statDataCl[gasVer].PrimaryGas.upper()][obs]))
                 avkVMR[gasVer][obs,:,:] = np.dot(np.dot(Iapriori,np.squeeze(avkSCF[gasVer][obs,:,:])),IaprioriInv)       
                 
-            avkSCF[gasVer]     = np.delete(avkSCF[gasVer],statDataCl[gasVer].inds,axis=0)
-            avkVMR[gasVer]     = np.delete(avkVMR[gasVer],statDataCl[gasVer].inds,axis=0)
+            
             dofs               = np.diagonal(avkSCF[gasVer],axis1=1,axis2=2)
             avkSCFav[gasVer]     = np.mean(avkSCF[gasVer],axis=0)
             avkVMRav[gasVer]     = np.mean(avkVMR[gasVer],axis=0)
             
             dofsAvg[gasVer]    = np.diag(avkSCFav[gasVer])
             dofsAvg_cs[gasVer] = np.cumsum(np.diag(avkSCFav[gasVer])[::-1])[::-1]
+
+        #----------------------------------------
+        # Calculate total column averaging kernel
+        #----------------------------------------
+        nobs            = len(dates[gasVer])
+        nlyrs           = len(alt[gasVer])
+        avkTC_i           = np.zeros((nobs,nlyrs))
+        for i in range(0,nobs):
+            AirMtemp  = np.squeeze(Airmass[gasVer][i,:])
+            akTemp    = np.squeeze(avkSCF[gasVer][i,:,:])
+            AirMinv   = np.diag(1.0/AirMtemp)
+            avkTC_i[i,:] = np.dot(np.dot(AirMtemp,akTemp),AirMinv)
+
+        avkTC[gasVer]  = np.asarray(avkTC_i)
             
         #--------------------------------------
         # Remove retrieval data based on filter
@@ -508,6 +525,11 @@ def main():
         PresPrf[gasVer]   = np.delete(PresPrf[gasVer],statDataCl[gasVer].inds,axis=0)   
 
         if gasName[j].lower() == 'h2o':  rPrfVMR_2 = np.delete(rPrfVMR_2,statDataCl[gasVer].inds,axis=0)
+
+        avkSCF[gasVer]     = np.delete(avkSCF[gasVer],statDataCl[gasVer].inds,axis=0)
+        avkVMR[gasVer]     = np.delete(avkVMR[gasVer],statDataCl[gasVer].inds,axis=0) 
+
+        avkTC[gasVer]     = np.delete(avkTC[gasVer],statDataCl[gasVer].inds,axis=0) 
 
         if errorFlg:
             rand_err[gasVer] = np.delete(rand_err[gasVer],statDataCl[gasVer].inds,axis=0)
@@ -748,7 +770,6 @@ def main():
     indsaoi        = mf.nearestind(aoi, alt_h2o)
     aoi            = alt_h2o[indsaoi]
 
-
     TC_h2o          = totClmn[h2over][inds2]
     Dates_h2o       = dates[h2over][inds2]
    
@@ -777,8 +798,11 @@ def main():
 
     PresPrf_h2o     = PresPrf[h2over][:, indsalt];                      PresPrf_h2o = PresPrf_h2o[inds2, :]
 
+    avkTC_h2o       = avkTC[h2over][inds2, :] 
+    aPrf_h2oMol     = aPrfMol[h2over][inds2,:]
+
     if errorFlg: 
-        TCe_h2o         = totClmn_e[h2over][inds2]
+        TC_h2o_e         = totClmn_e[h2over][inds2]
         #tot_err_h2o     = tot_err[h2over][:, indsalt]; tot_err_h2o = tot_err_h2o[inds2, :]
         #VMR_e_ns_h2o    = tot_errvmr[h2over][inds2, indsaoi]
         VMR_e_ns_h2o    = totErr_h2o[:, indsaoi] #tot_errvmr[h2over][inds2, indsaoi]
@@ -813,8 +837,10 @@ def main():
     VMR_ns_hdo      = Prf_hdo[:, indsaoi]   #rPrfVMR[hdover][inds1, indsaoi]*3.107e-4
     VMRa_ns_hdo     = aPrf_hdo[:, indsaoi] #aPrfVMR[hdover][inds1, indsaoi]*3.107e-4
 
+    avkTC_hdo       = avkTC[hdover][inds2, :] 
+
     if errorFlg: 
-        TCe_hdo         = totClmn_e[hdover][inds1]*3.107e-4
+        TC_hdo_e         = totClmn_e[hdover][inds1]*3.107e-4
         #tot_err_hdo     = tot_err[hdover][:, indsalt]*3.107e-4; tot_err_hdo = tot_err_hdo[inds1, :]
         #VMR_e_ns_hdo    = tot_errvmr[hdover][inds1, indsaoi]*3.107e-4
 
@@ -830,9 +856,29 @@ def main():
     Prf_h2o_s = []
     Prf_hdo_s = []
 
+    #TC_hdo_s  = []
+
     for itime in range(len(Prf_h2o)):
         Prf_h2o_s.append(aPrf_hdo[itime, :]/3.107e-4 + np.dot(avkVMR_hdo[itime, :, :], (Prf_h2o[itime, :] -  aPrf_hdo[itime, :]/3.107e-4)) )
         Prf_hdo_s.append(aPrf_h2o[itime, :]*3.107e-4 + np.dot(avkVMR_h2o[itime, :, :], (Prf_hdo[itime, :] -  aPrf_h2o[itime, :]*3.107e-4)) )
+
+        TC_ap  = np.sum(aPrf_h2oMol[itime,:])
+
+        #print avkTC_h2o[itime, :].shape
+        # print TC_ap.shape
+        # print TC_hdo[itime].shape
+        # exit()
+
+        # print TC_ap*3.107e-4
+        # print avkTC_h2o[itime, :]
+        # print TC_hdo[itime]
+        # print np.dot(avkTC_h2o[itime, :], (TC_hdo[itime] -  TC_ap*3.107e-4))[0]
+        # print np.sum(avkTC_h2o[itime, :]*(TC_hdo[itime] -  TC_ap*3.107e-4))
+        # print TC_hdo[itime] -  TC_ap*3.107e-4
+
+        #exit()
+
+        #TC_hdo_s.append(TC_ap*3.107e-4+ np.sum(abs(np.dot(avkTC_h2o[itime, :], (TC_hdo[itime] -  TC_ap*3.107e-4)))) )
 
         #Prf_h2o_s.append(aPrf_hdo[itime, :]/3.107e-4 + np.dot(avkVMRav_hdo, (Prf_h2o[itime, :] -  aPrf_hdo[itime, :]/3.107e-4)) )
         #Prf_hdo_s.append(aPrf_h2o[itime, :]*3.107e-4 + np.dot(avkVMRav_h2o, (Prf_hdo[itime, :] -  aPrf_h2o[itime, :]*3.107e-4)) )
@@ -844,17 +890,25 @@ def main():
     VMR_ns_h2o_s      = Prf_h2o_s[:,indsaoi]
     VMR_ns_hdo_s      = Prf_hdo_s[:,indsaoi]
 
+    #TC_hdo_s      = np.asarray(TC_hdo_s)
+
+    #print TC_hdo_s.shape
+
+    #exit()
+
     
     #---------------------------------
     # Defining dD (FTIR)
     #---------------------------------
     Prf_dD      = (np.divide(Prf_hdo, Prf_h2o)/3.1152e-4 - 1.0) *1000.
-    TC_dD       = np.sum(Prf_dD, axis=1)
+    #TC_dD       = np.sum(Prf_dD, axis=1)
+    TC_dD       = (np.divide(TC_hdo, TC_h2o)/3.1152e-4 - 1.0) *1000.
     dDfts       = (np.divide(VMR_ns_hdo, VMR_ns_h2o)/3.1152e-4 - 1.0) *1000.
     dDfts2      = Prf_dD[:, indsaoi]
 
     Prf_dD_s      = (np.divide(Prf_hdo_s, Prf_h2o)/3.1152e-4 - 1.0) *1000.
-    TC_dD_s       = np.sum(Prf_dD_s, axis=1)
+    #TC_dD_s       = np.sum(Prf_dD_s, axis=1)
+    #TC_dD_s       = (np.divide(TC_hdo_s, TC_h2o)/3.1152e-4 - 1.0) *1000.
     dDfts_s       = (np.divide(VMR_ns_hdo_s, VMR_ns_h2o)/3.1152e-4 - 1.0) *1000.
 
     #---------------------------------
@@ -866,6 +920,7 @@ def main():
 
     if errorFlg: 
         dDfts_e           = dDfts_TotErr[:,indsaoi]
+        TC_dD_e           = np.abs(TC_dD)*(np.sqrt( (TC_hdo_e/TC_hdo)**2 + (TC_h2o_e/TC_h2o)**2 ))
 
     #---------------------------------
     #Second Filter: positive dD profiles
@@ -882,6 +937,7 @@ def main():
     #Filter H2O
     #---------------------------------
     TC_h2o           = np.delete(TC_h2o, indsFilter, axis=0)
+    TC_h2o_e          = np.delete(TC_h2o_e, indsFilter, axis=0)
     Dates_h2o        = np.delete(Dates_h2o, indsFilter, axis=0)
     Prf_h2o          = np.delete(Prf_h2o, indsFilter, axis=0)
     aPrf_h2o         = np.delete(aPrf_h2o, indsFilter, axis=0)
@@ -910,6 +966,7 @@ def main():
     #Filter HDO
     #---------------------------------
     TC_hdo           = np.delete(TC_hdo, indsFilter, axis=0)
+    TC_hdo_e         = np.delete(TC_hdo_e, indsFilter, axis=0)
     Dates_hdo        = np.delete(Dates_hdo, indsFilter, axis=0)
     Prf_hdo          = np.delete(Prf_hdo, indsFilter, axis=0)
     aPrf_hdo         = np.delete(aPrf_hdo, indsFilter, axis=0)
@@ -919,7 +976,6 @@ def main():
     TCpc_hdo         = np.delete(TCpc_hdo, indsFilter, axis=0)
     VMR_ns_hdo       = np.delete(VMR_ns_hdo, indsFilter, axis=0)
     VMRa_ns_hdo      = np.delete(VMRa_ns_hdo, indsFilter, axis=0)
-    TCe_hdo          = np.delete(TCe_hdo, indsFilter, axis=0)
     #tot_err_hdo      = np.delete(tot_err_hdo, indsFilter, axis=0)
     VMR_e_ns_hdo     = np.delete(VMR_e_ns_hdo, indsFilter, axis=0)
     avkVMR_hdo       = np.delete(avkVMR_hdo, indsFilter, axis=0)
@@ -941,8 +997,12 @@ def main():
     doy_h2o          = mf.toYearFraction(Dates_h2o)
     doy_hdo          = mf.toYearFraction(Dates_hdo)
 
-    Prf_dD_s           = np.delete(Prf_dD_s, indsFilter, axis=0)
-    dDfts_s            = np.delete(dDfts_s, indsFilter, axis=0)
+    Prf_dD_s         = np.delete(Prf_dD_s, indsFilter, axis=0)
+    dDfts_s          = np.delete(dDfts_s, indsFilter, axis=0)
+
+    TC_dD            = np.delete(TC_dD, indsFilter)
+    #TC_dD_s          = np.delete(TC_dD_s, indsFilter)
+    TC_dD_e          = np.delete(TC_dD_e, indsFilter)
 
 
     #-------------------------------------------------
@@ -959,6 +1019,7 @@ def main():
     dDP_s        = {}
 
     PresP        = {}
+    altw         = {}
     
     for p, pcol in enumerate(pCols):
         
@@ -970,33 +1031,53 @@ def main():
         vmrP_hdo.setdefault(str(p) ,[]).append(np.average(Prf_hdo[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
         vmrP_hdo_e.setdefault(str(p) ,[]).append(np.average(totErr_hdo[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
 
-        dDP.setdefault(str(p) ,[]).append(np.average(Prf_dD[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
-        dDP_e.setdefault(str(p) ,[]).append(np.average(dDfts_TotErr[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
+        #dDP.setdefault(str(p) ,[]).append(np.average(Prf_dD[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
+        #dDP_e.setdefault(str(p) ,[]).append(np.average(dDfts_TotErr[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
 
         vmrP_h2o_s.setdefault(str(p) ,[]).append(np.average(Prf_h2o_s[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
-      
         vmrP_hdo_s.setdefault(str(p) ,[]).append(np.average(Prf_hdo_s[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1]))
         
-        dDP_s.setdefault(str(p) ,[]).append(np.average(Prf_dD_s[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1])) 
+        #dDP_s.setdefault(str(p) ,[]).append(np.average(Prf_dD_s[:,ind2:ind1],axis=1,weights=Airmass_h2o[:,ind2:ind1])) 
 
         PresP.setdefault(str(p) ,[]).append(np.average(PresPrf_h2o[:,ind2:ind1],axis=1, weights=Airmass_h2o[:,ind2:ind1]))
 
-        altw = np.average(alt_h2o[ind2:ind1], weights=Airmass_h2o[100, ind2:ind1])
+        altw.setdefault(str(p) ,[]).append(np.average(alt_h2o[ind2:ind1], weights=np.mean(Airmass_h2o[:, ind2:ind1], axis=0)))
+
 
     for p, pcol in enumerate(pCols):
         vmrP_h2o[str(p)] = np.asarray(vmrP_h2o[str(p)])
         vmrP_hdo[str(p)] = np.asarray(vmrP_hdo[str(p)])
-        dDP[str(p)]      = np.asarray(dDP[str(p)])
+        #dDP[str(p)]      = np.asarray(dDP[str(p)])
 
         vmrP_h2o_e[str(p)] = np.asarray(vmrP_h2o_e[str(p)])
         vmrP_hdo_e[str(p)] = np.asarray(vmrP_hdo_e[str(p)])
+        #dDP_e[str(p)]      = np.asarray(dDP_e[str(p)])
+
+        dDP.setdefault(str(p) ,[]).append((np.divide(vmrP_hdo[str(p)][0], vmrP_h2o[str(p)][0])/3.1152e-4 - 1.0) *1000.)
+        dDP_e.setdefault(str(p) ,[]).append(np.abs(dDP[str(p)][0])*(np.sqrt( (vmrP_hdo_e[str(p)][0]/vmrP_hdo[str(p)][0])**2 + (vmrP_h2o_e[str(p)][0]/vmrP_h2o[str(p)][0])**2 ))    )
+
+        dDP[str(p)]        = np.asarray(dDP[str(p)])
         dDP_e[str(p)]      = np.asarray(dDP_e[str(p)])
 
         vmrP_h2o_s[str(p)] = np.asarray(vmrP_h2o_s[str(p)])
         vmrP_hdo_s[str(p)] = np.asarray(vmrP_hdo_s[str(p)])
+        
+
+        dDP_s.setdefault(str(p) ,[]).append((np.divide(vmrP_hdo_s[str(p)][0], vmrP_h2o[str(p)][0])/3.1152e-4 - 1.0) *1000.)
+
         dDP_s[str(p)]      = np.asarray(dDP_s[str(p)])
 
-        PresP[str(p)]      = np.asarray(PresP[str(p)])    
+
+        PresP[str(p)]      = np.asarray(PresP[str(p)]) 
+
+        altw[str(p)]      = np.asarray(altw[str(p)])   
+
+        #print dDP_e[str(p)].shape
+        #print dDP_s[str(p)].shape
+
+        #exit()
+
+ 
 
     #---------------------------------
     #Error plots of dD - FTIR
@@ -1044,7 +1125,6 @@ def main():
     #---------------------------------
     # Interpolation of in-situ to FTS
     #---------------------------------
-
     if insFlg:
         doyin_i            = mf.toYearFraction(Date_in)
 
@@ -1613,8 +1693,6 @@ def main():
     #---------------------------------
     #dD vs Water vapor (several partial columns)
     #---------------------------------
-    
-
     #outer_grid = gridspec.GridSpec(2, 2, wspace=0.2, hspace=0.175)
     if len(pCols) <= 3: 
         outer_grid = gridspec.GridSpec(1, len(pCols),  wspace=0.25, hspace=0.35)
@@ -1652,11 +1730,43 @@ def main():
 
         plt.suptitle('[dD, H2O] - weighted mean', fontsize=16)
         
+    if saveFlg:     
+        pdfsav.savefig(fig,dpi=200)
+    else:           
+        plt.show(block=False)
+
+    #---------------------------------
+    # FIGURE - dD vs Water vapor (Total Columns)
+    #---------------------------------
+
+    fig, ax = plt.subplots(figsize=(8,6))
+    
+    if errorFlg: 
+        ax.errorbar(TC_h2o,TC_dD, yerr=TC_dD_e, xerr= TC_h2o_e,  fmt='o', ecolor='g', mec='g', mfc='w', mew=1, label='FTIR')
+        #ax.errorbar(TC_h2o,TC_dD_s, yerr=TC_dD_e, xerr= TC_h2o_e,  fmt='o', ecolor='r', mec='r', mfc='w', mew=1, label='FTIR-smoothed')
+    else:
+        ax.scatter(TC_h2o,TC_dD, facecolors='white', s=40, color='r', label='FTIR')
+    
+    ax.grid(True)
+    ax.set_ylabel('dD [total column]',fontsize=14)
+    ax.set_xlabel('H2O [total column]',fontsize=14)
+    ax.tick_params(labelsize=14)
+    #ax.set_ylim(-750, 0)
+    #ax.xaxis.set_minor_locator(dayLc)
+    #ax.xaxis.set_major_formatter(DateFmt)
+    ax.legend(prop={'size':14})
+
+    plt.suptitle('[dD, H2O] - Total Column', fontsize=16)
+
+    fig.subplots_adjust(left=0.1, right=0.95)
 
     if saveFlg:     
         pdfsav.savefig(fig,dpi=200)
     else:           
         plt.show(block=False)
+
+    #user_input = raw_input('Press any key to exit >>> ')
+    #sys.exit()
         
 
     #---------------------------------
@@ -1985,7 +2095,7 @@ def main():
         #-----------------------------------------
         # Open output file for year and write data
         #-----------------------------------------
-        with open('/data/iortega/results/'+loc.lower()+'/WP_dD_'+loc.upper()+'.ascii', 'w') as fopen:
+        with open('/data/iortega/results/'+loc.lower()+'/WP_dD_'+loc.upper()+'2.ascii', 'w') as fopen:
             writer = csv.writer(fopen, delimiter='\t', lineterminator='\n')
 
             fopen.write('#Hannigan, J.W., Ortega, I\n')
@@ -2025,7 +2135,7 @@ def main():
        #-----------------------------------------
        # Open output file for year and write data
        #-----------------------------------------
-        with open('/data/iortega/results/'+loc.lower()+'/WP_dD_Weighted_'+loc.upper()+'.ascii', 'w') as fopen:
+        with open('/data/iortega/results/'+loc.lower()+'/WP_dD_Weighted_'+loc.upper()+'2.ascii', 'w') as fopen:
             writer = csv.writer(fopen, delimiter='\t', lineterminator='\n')
 
             fopen.write('#Hannigan, J.W., Ortega, I\n')
@@ -2035,27 +2145,32 @@ def main():
             fopen.write('#CONTACT_INFO: Ortega, Ivan, iortega@ucar.edu, 303-497-1861, NCAR, 3090 Center Green Drive, Boulder, CO 80301\n')
             fopen.write('#DATA_INFO: Tropospheric Water Vapor and dD retrieved from HR-FTIR\n')
             fopen.write('#Number of Profiles: {}\n'.format(len(DT)))
-            alt2print = ["%.2f"%v for v in [4.8, 7.9]]
+            alt2print = ["%.2f"%float(v) for v in [4.8, 7.9, 6.6]]
             fopen.write('#Altitude Weighted [km]: ')
             writer.writerows([alt2print])
-            fopen.write('#-------------------------------------------------\n')
-            fopen.write('#   LABEL                  Units            Column\n')
-            fopen.write('#-------------------------------------------------\n')
-            fopen.write('#   H2O Weighted           [ppm]                1  \n')
-            fopen.write('#   H2O Error Weighted     [ppm]                2  \n')
-            fopen.write('#   dD Weighted            [per mil]            3  \n')
-            fopen.write('#   dD Error Weighted      [per mil]            4  \n')
-            fopen.write('#   Pressure Weighted      [mbar]               5  \n')
-            fopen.write('#-------------------------------------------------\n')
+            fopen.write('#---------------------------------------------------------------\n')
+            fopen.write('#   LABEL                                Units            Column\n')
+            fopen.write('#---------------------------------------------------------------\n')
+            fopen.write('#   H2O Weighted                         [ppm]               1  \n')
+            fopen.write('#   H2O Error Weighted                   [ppm]               2  \n')
+            fopen.write('#   Note: fourth row is Total Column     [molec/cm2]         2  \n')
+            fopen.write('#   dD Weighted                          [per mil]           3  \n')
+            fopen.write('#   dD Error Weighted                    [per mil]           4  \n')
+            fopen.write('#   Pressure Weighted                    [mbar]              5  \n')
+            fopen.write('#---------------------------------------------------------------\n')
 
             for i, d in enumerate(DT):
 
                 fopen.write('# Date: {}\n'.format(d))
 
                 for p, pcol in enumerate(pCols):
-                    row = [vmrP_h2o_s[str(p)][0,i], vmrP_h2o_e[str(p)][0,i], dDP_s[str(p)][0,i], dDP_e[str(p)][0,i], PresP[str(p)][0,i]]
+                    row = [vmrP_h2o[str(p)][0,i], vmrP_h2o_e[str(p)][0,i], dDP_s[str(p)][0,i], dDP_e[str(p)][0,i], PresP[str(p)][0,i]]
                     row2 = [ "%.3f"%k for k in row] 
                     writer.writerows([row2])
+
+                row = [TC_h2o[i], TC_h2o_e[i], TC_dD[i], TC_dD_e[i], -9999]
+                row2 = [ "%.3e"%k for k in row] 
+                writer.writerows([row2])
 
     if saveFlg:     
         pdfsav.close()
